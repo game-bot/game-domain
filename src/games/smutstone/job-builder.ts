@@ -9,7 +9,7 @@ import { AuthDataProvider } from "./data/auth-data-provider";
 import { UserDataProvider } from "./data/user-data-provider";
 import { OpenBronzeBoxJob } from "./jobs/open-bronze-box-job";
 
-export class SmutestoneJobBuilder {
+export class SmutstoneJobBuilder {
     private authProvider: IPlayerDataProvider<AuthData>
     private userDataProvider: IPlayerDataProvider<UserData>
 
