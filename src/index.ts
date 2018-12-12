@@ -5,3 +5,4 @@ export { JobBuilder } from './job-builder';
 export { Player } from './player';
 export { MemoryPlayerDataRepository } from './data/memory-player-data-repository';
 export { IGameJob, GameJobResult } from './game-job';
+export { GameResourcesData } from './game-resources';

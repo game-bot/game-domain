@@ -14,6 +14,9 @@ export type GameJobResult = {
     status: GameTaskResultStatus
     error?: GamebotError
     resources?: GameResourcesData
+    tasks?: GameTaskResult[]
+    startAt?: string
+    endAt?: string
 }
 
 export interface IGameJob {
@@ -26,7 +29,11 @@ export abstract class GameJob<AD> implements IGameJob {
     async execute(player: Player): Promise<GameJobResult> {
         const jobName = this.constructor.name;
         debug(`Start job: ${jobName}`);
+        const startAt = new Date().toISOString();
         const result = await this.innerExecute(player);
+        const endAt = new Date().toISOString();
+        result.startAt = startAt;
+        result.endAt = endAt;
         debug(`End job: ${jobName}`);
         return result;
     }
@@ -40,6 +47,8 @@ export abstract class GameJob<AD> implements IGameJob {
             const resources = GameJob.mergeGameResources(resourcesList);
             result.resources = resources.getData();
         }
+
+        result.tasks = taskResults;
 
         return result;
     }
@@ -59,15 +68,19 @@ export abstract class GameJob<AD> implements IGameJob {
     protected abstract innerExecute(player: Player): Promise<GameJobResult>
 
     protected createJobResultFromTaskResult(taskResult: GameTaskResult) {
-        return this.createJobResult(taskResult);
+        const result = this.createJobResult(taskResult);
+        result.tasks = [taskResult];
+
+        return result;
     }
 
-    protected createJobResult({ playerId, error, resources, status }:
+    protected createJobResult({ playerId, error, resources, status, tasks }:
         {
             playerId: string,
             error?: GamebotError,
             resources?: GameResourcesData,
-            status?: GameTaskResultStatus
+            status?: GameTaskResultStatus,
+            tasks?: GameTaskResult[]
         }) {
 
         status = status || (error ? 'error' : 'done');
@@ -79,6 +92,7 @@ export abstract class GameJob<AD> implements IGameJob {
             playerId,
             error,
             resources,
+            tasks,
         }
 
         return result;

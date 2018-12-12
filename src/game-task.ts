@@ -12,10 +12,11 @@ export type GameTaskResult<D=any> = {
     playerId: string
     taskId: string
     status: GameTaskResultStatus
-    continuable?: boolean
     error?: GamebotError
     data?: D
     resources?: GameResourcesData
+    startAt?: string
+    endAt?: string
 }
 
 export interface IGameTask<AD> {
@@ -28,7 +29,11 @@ export abstract class GameTask<AD, RD=any> implements IGameTask<AD> {
     async execute(player: Player, authData: AD, data?: any): Promise<GameTaskResult<RD>> {
         const taskName = this.constructor.name;
         debug(`Start task: ${taskName}`);
+        const startAt = new Date().toISOString();
         const result = await this.innerExecute(player, authData, data);
+        const endAt = new Date().toISOString();
+        result.startAt = startAt;
+        result.endAt = endAt;
         debug(`End task: ${taskName}`);
 
         return result;
@@ -40,9 +45,8 @@ export abstract class GameTask<AD, RD=any> implements IGameTask<AD> {
         return this.constructor.name;
     }
 
-    protected createTaskResult({ continuable, error, data, resources, status, playerId }:
+    protected createTaskResult({ error, data, resources, status, playerId }:
         {
-            continuable?: boolean,
             error?: GamebotError,
             data?: RD,
             resources?: GameResourcesData,
@@ -57,7 +61,6 @@ export abstract class GameTask<AD, RD=any> implements IGameTask<AD> {
             gameId: this.info.gameId,
             taskId: this.getTaskId(),
             status,
-            continuable,
             error,
             data,
             resources,
