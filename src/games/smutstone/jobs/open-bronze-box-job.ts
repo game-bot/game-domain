@@ -6,11 +6,11 @@ import { Player } from "../../../player";
 import gameInfo from "../game-info";
 import { IPlayerDataProvider } from "../../../data/player-data-provider";
 import { AuthData } from "../data/auth-data";
-import { Api } from "../api";
-import { SmutstoneTask } from "../smutstone-task";
-import { GameTaskResult } from "../../../game-task";
+import { SmutstoneApi } from "../api";
+import { SmutstoneApiTask } from "../smutstone-task";
 import { UserData } from "../data/user-data";
-import { createGameResourcesFromRewards, SmutstoneResources } from "../resources";
+import { createGameResourcesFromRewards } from "../resources";
+import { ToolboxApiDataParser, ToolboxApiData } from "../api/toolbox-data";
 
 export const jobInfo: GameJobInfo = {
     id: 'open-bronze-box',
@@ -21,16 +21,16 @@ export const jobInfo: GameJobInfo = {
 
 export class OpenBronzeBoxJob extends SmutstoneJob {
     private task: OpenBronzeBoxTask
-    constructor(authProvider: IPlayerDataProvider<AuthData>, private userDataProvider: IPlayerDataProvider<UserData>) {
-        super(jobInfo, authProvider);
-        this.task = new OpenBronzeBoxTask();
+    constructor(api: SmutstoneApi, authProvider: IPlayerDataProvider<AuthData>, private userDataProvider: IPlayerDataProvider<UserData>) {
+        super(jobInfo, authProvider, api);
+        this.task = new OpenBronzeBoxTask(api);
     }
 
     protected async innerExecute(player: Player) {
         const authData = (await this.authProvider.get(player)).data;
         const userData = (await this.userDataProvider.get(player)).data;
 
-        const boxTime = userData.vars.__LBOX_T as number;
+        const boxTime = userData.vars.__LBOX_T;
         const timeDiff = boxTime + 28800 - (userData.gameTime / 1000);
 
         if (timeDiff > 0) {
@@ -44,17 +44,15 @@ export class OpenBronzeBoxJob extends SmutstoneJob {
     }
 }
 
-class OpenBronzeBoxTask extends SmutstoneTask {
-    constructor() {
-        super(jobInfo);
+class OpenBronzeBoxTask extends SmutstoneApiTask<ToolboxApiData> {
+    constructor(api: SmutstoneApi) {
+        super(jobInfo, api, new ToolboxApiDataParser());
     }
 
-    async innerExecute(player: Player, authData: AuthData): Promise<GameTaskResult<SmutstoneResources>> {
-        const response = await Api.call(authData, { "method": "lootbox.open", "args": { "typeId": 6000 } });
-        const error = Api.createError(response, this.createErrorDetails());
-        const data = response.data;
-        const resources = data && data.rewards && createGameResourcesFromRewards(data.rewards).getData() || undefined;
-
-        return this.createTaskResult({ error, data, resources, playerId: player.id });
+    protected createApiData(_player: Player) {
+        return { "method": "lootbox.open", "args": { "typeId": 6000 } };
+    }
+    protected createResources(data: ToolboxApiData) {
+        return createGameResourcesFromRewards(data.rewards).getData();
     }
 }

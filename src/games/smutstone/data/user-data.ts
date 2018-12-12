@@ -1,5 +1,6 @@
 import { PlayerData, PlayerDataInfo } from "../../../data/player-data";
-import { Dictionary } from "../../../utils";
+import { DataParser } from "../../../data/data-parser";
+import * as Joi from 'joi';
 
 export const UserDataInfo: PlayerDataInfo = {
     identifier: 'user-data',
@@ -20,7 +21,7 @@ export type UserData = {
     username: string
     registered: number
     story: {
-        locations: UserStoryLocation[]
+        locations: UserDataStoryLocation[]
     }
     email_verified: boolean
     items: {
@@ -30,10 +31,12 @@ export type UserData = {
     hero: {
         exp: number
     },
-    vars: Dictionary<any>
+    vars: {
+        __LBOX_T: number
+    }
 }
 
-export type UserStoryLocation = {
+export type UserDataStoryLocation = {
     id: number
     missions: {
         doneStars: number
@@ -45,7 +48,7 @@ export type UserStoryLocation = {
 
 export type UserPlayerData = PlayerData<UserData>
 
-export const UserDataPickFields = [
+const UserDataPickFields = [
     'email',
     'resources',
     'gameTime',
@@ -58,3 +61,46 @@ export const UserDataPickFields = [
     'hero.exp',
     'vars.__LBOX_T',
 ]
+
+export class UserDataParser extends DataParser<UserData> {
+    constructor() {
+        super(UserDataPickFields, userDataSchema)
+    }
+}
+
+const userDataSchema = Joi.object().keys({
+    email: Joi.string().email(),
+    resources: Joi.object().keys({
+        denier: Joi.number().integer(),
+        energy_set_time: Joi.number().integer(),
+        energy: Joi.number().integer().required(),
+        gems: Joi.number().integer().required(),
+        gold: Joi.number().integer().required(),
+    }).required(),
+    gameTime: Joi.number().integer().required(),
+    username: Joi.string().min(1).max(100),
+    registered: Joi.number().integer(),
+    story: Joi.object().keys({
+        locations: Joi.array().items(Joi.object().keys({
+            id: Joi.number().integer().required(),
+            missions: Joi.array().items(Joi.object().keys({
+                doneStars: Joi.number().integer().required(),
+                won: Joi.number().integer().required(),
+                id: Joi.number().integer().required(),
+                lost: Joi.number().integer().required(),
+            })).required(),
+        }).required()),
+    }).required(),
+    email_verified: Joi.boolean(),
+    items: Joi.object().keys({
+        items: Joi.array().items(Joi.array().items(Joi.number().integer(), null))
+    }).required(),
+    country: Joi.string().max(50),
+    hero: Joi.object().keys({
+        exp: Joi.number().integer().min(0).required(),
+    }).required(),
+    vars: Joi.object().keys({
+        __LBOX_T: Joi.number().integer().required(),
+    }).required(),
+}).required();
+

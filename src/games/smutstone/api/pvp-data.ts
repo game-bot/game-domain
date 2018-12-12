@@ -1,0 +1,79 @@
+import { DataParser } from "../../../data/data-parser";
+import * as Joi from 'joi';
+import { Dictionary } from "../../../utils";
+
+export type PvpApiData = {
+    chests: PvpChestApiData[]
+    points: number
+    starChest: PvpStarChestApiData
+    slots: number
+}
+
+export type PvpChestApiData = { added: number, rarity: number, id: number, league: number }
+export type PvpStarChestApiData = { stars: number, last: number, league: number }
+
+export class PvpApiDataParser extends DataParser<PvpApiData> {
+    constructor() {
+        super(['chests', 'points', 'starChest', 'slots'], pvpSchema.required())
+    }
+}
+
+export type PvpClaimChestApiData = {
+    unlocked: boolean
+    reward: Dictionary<any>
+}
+
+export class PvpClaimChestApiDataParser extends DataParser<PvpClaimChestApiData> {
+    constructor() {
+        super(['unlocked', 'reward'], claimChestSchema.required())
+    }
+}
+
+export type PvpFightBattleApiData = {
+    chest?: PvpChestApiData
+    result: {
+        result: string
+    }
+    starChest: PvpStarChestApiData
+    pointsGain: number
+}
+
+export class PvpFightBattleApiDataParser extends DataParser<PvpFightBattleApiData> {
+    constructor() {
+        super(['chest', 'result', 'starChest', 'pointsGain'], fightBattleSchema.required())
+    }
+}
+
+const chestSchema = Joi.object().keys({
+    added: Joi.number().integer().required(),
+    rarity: Joi.number().integer().required(),
+    id: Joi.number().integer().required(),
+    league: Joi.number().integer().required(),
+});
+
+const starChestSchema = Joi.object().keys({
+    stars: Joi.number().integer().required(),
+    last: Joi.number().integer().required(),
+    league: Joi.number().integer().required(),
+});
+
+const fightBattleSchema = Joi.object().keys({
+    chest: chestSchema,
+    result:Joi.object().keys({
+        result: Joi.string().required(),
+    }).required(),
+    starChest: starChestSchema.required(),
+    pointsGain: Joi.number().integer().required(),
+});
+
+const claimChestSchema = Joi.object().keys({
+    unlocked: Joi.bool(),
+    reward: Joi.object().required(),
+});
+
+const pvpSchema = Joi.object().keys({
+    chests: Joi.array().items(chestSchema).required(),
+    points: Joi.number().integer().positive().required(),
+    starChest: starChestSchema.required(),
+    slots: Joi.number().integer().positive().required(),
+});

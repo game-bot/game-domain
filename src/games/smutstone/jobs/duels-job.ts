@@ -7,13 +7,14 @@ import { Player } from "../../../player";
 import gameInfo from "../game-info";
 import { IPlayerDataProvider } from "../../../data/player-data-provider";
 import { AuthData } from "../data/auth-data";
-import { Api } from "../api";
-import { SmutstoneTask } from "../smutstone-task";
+import { SmutstoneApi } from "../api";
+import { SmutstoneTask, SmutstoneApiTask } from "../smutstone-task";
 import { GameTaskResult } from "../../../game-task";
 import { delay, Dictionary } from "../../../utils";
 import { UserData } from "../data/user-data";
 import { createGameResourcesFromRewards, SmutstoneResources } from "../resources";
 import { GameResources } from "../../../game-resources";
+import { PvpApiDataParser, PvpApiData, PvpClaimChestApiData, PvpClaimChestApiDataParser, PvpFightBattleApiData, PvpFightBattleApiDataParser, PvpChestApiData } from "../api/pvp-data";
 
 export const jobInfo: GameJobInfo = {
     id: 'duels',
@@ -26,27 +27,28 @@ export class DuelsJob extends SmutstoneJob {
     private fight: PvpBattleFightTask
     private claimStartchest: ClaimStarChestTask
     private claimChest: ClaimChestTask
-    constructor(authProvider: IPlayerDataProvider<AuthData>, private userDataProvider: IPlayerDataProvider<UserData>) {
-        super(jobInfo, authProvider);
-
-        this.fight = new PvpBattleFightTask();
-        this.claimStartchest = new ClaimStarChestTask();
-        this.claimChest = new ClaimChestTask();
+    private pvpDataParser: PvpApiDataParser
+    constructor(api: SmutstoneApi, authProvider: IPlayerDataProvider<AuthData>, private userDataProvider: IPlayerDataProvider<UserData>) {
+        super(jobInfo, authProvider, api);
+        this.pvpDataParser = new PvpApiDataParser();
+        this.fight = new PvpBattleFightTask(api);
+        this.claimStartchest = new ClaimStarChestTask(api);
+        this.claimChest = new ClaimChestTask(api);
     }
 
     protected async innerExecute(player: Player) {
         const playerId = player.id;
         const authData = (await this.authProvider.get(player)).data;
         const userData = (await this.userDataProvider.get(player)).data;
-        const duelsDataResponse = await Api.call(authData, { "method": "pvp.load", "args": {} });
+        const duelsDataResponse = await this.api.apiCall(authData, { "method": "pvp.load", "args": {} });
         const errorDetails = this.createErrorDetails();
-        let error = Api.createError(duelsDataResponse, errorDetails);
+        let error = this.api.createError(duelsDataResponse, errorDetails);
 
         if (error) {
             return this.createJobResult({ error, playerId });
         }
 
-        const duelsData = duelsDataResponse.data as DuelsData;
+        const duelsData = this.pvpDataParser.parse(duelsDataResponse.data);
 
         const taskResults = await this.claimChests(player, authData, duelsData, userData);
 
@@ -55,14 +57,14 @@ export class DuelsJob extends SmutstoneJob {
         return this.createJobResultFromTaskResults(taskResults);
     }
 
-    private async claimChests(player: Player, authData: AuthData, duelsData: DuelsData, userData: UserData) {
-        const results: GameTaskResult<SmutstoneResources>[] = []
+    private async claimChests(player: Player, authData: AuthData, duelsData: PvpApiData, userData: UserData) {
+        const results: GameTaskResult<PvpClaimChestApiData>[] = []
         if (duelsData.starChest.stars > 2) {
             results.push(await this.claimStartchest.execute(player, authData));
             await delay(1000)
         }
 
-        const claimedChests: DuelsChestData[] = []
+        const claimedChests: PvpChestApiData[] = []
 
         for (const chest of duelsData.chests) {
             const endTime = 1e3 * chest.added + CHEST_TIMES[chest.rarity].time;
@@ -86,7 +88,7 @@ export class DuelsJob extends SmutstoneJob {
         return results;
     }
 
-    private async fillChests(player: Player, authData: AuthData, duelsData: DuelsData, results: GameTaskResult[], inc?: number) {
+    private async fillChests(player: Player, authData: AuthData, duelsData: PvpApiData, results: GameTaskResult[], inc?: number) {
         inc = inc || 0;
         if (inc > 4) {
             debug(`fillChests inc > 4`)
@@ -112,21 +114,23 @@ export class DuelsJob extends SmutstoneJob {
 }
 
 class ClaimChestTask extends SmutstoneTask {
-    constructor() {
-        super(jobInfo);
+    private parser: PvpClaimChestApiDataParser
+    constructor(api: SmutstoneApi) {
+        super(jobInfo, api);
+        this.parser = new PvpClaimChestApiDataParser();
     }
 
     async innerExecute(player: Player, authData: AuthData, chestId: number) {
         const playerId = player.id;
-        const response = await Api.call(authData, { "method": "pvp.chest.claim", "args": { "id": chestId, "unlock": true } });
+        const response = await this.api.apiCall(authData, { "method": "pvp.chest.claim", "args": { "id": chestId, "unlock": true } });
         const errorDetails = this.createErrorDetails();
-        let error = Api.createError(response, errorDetails);
+        let error = this.api.createError(response, errorDetails);
 
         if (error) {
             return this.createTaskResult({ error, playerId });
         }
 
-        const data = response.data;
+        const data = this.parser.parse(response.data);
 
         const resources = createGameResourcesFromRewards([data && data.reward || {}]).getData();
 
@@ -134,47 +138,42 @@ class ClaimChestTask extends SmutstoneTask {
     }
 }
 
-class ClaimStarChestTask extends SmutstoneTask {
-    constructor() {
-        super(jobInfo);
+class ClaimStarChestTask extends SmutstoneApiTask<PvpClaimChestApiData> {
+    constructor(api: SmutstoneApi) {
+        super(jobInfo, api, new PvpClaimChestApiDataParser());
     }
 
-    async innerExecute(player: Player, authData: AuthData) {
-        const playerId = player.id;
-
-        const response = await Api.call(authData, { "method": "pvp.starchest.claim", "args": {} });
-        const errorDetails = this.createErrorDetails();
-        let error = Api.createError(response, errorDetails);
-
-        const data = response.data;
-
-        const resources = createGameResourcesFromRewards([data && data.reward || {}]).getData();
-
-        return this.createTaskResult({ error, playerId, resources, data });
+    protected createApiData(_player: Player) {
+        return { "method": "pvp.starchest.claim", "args": {} };
+    }
+    protected createResources(data: PvpClaimChestApiData) {
+        return createGameResourcesFromRewards([data && data.reward || {}]).getData()
     }
 }
 
-class PvpBattleFightTask extends SmutstoneTask<PvpFightBattleData> {
-    constructor() {
-        super(jobInfo);
+class PvpBattleFightTask extends SmutstoneTask<PvpFightBattleApiData> {
+    private parser: PvpFightBattleApiDataParser
+    constructor(api: SmutstoneApi) {
+        super(jobInfo, api);
+        this.parser = new PvpFightBattleApiDataParser();
     }
 
     async innerExecute(player: Player, authData: AuthData) {
 
         const playerId = player.id;
-        const startResponse = await Api.call(authData, { "method": "pvp.battle.start", "args": {} });
+        const startResponse = await this.api.apiCall(authData, { "method": "pvp.battle.start", "args": {} });
         const errorDetails = this.createErrorDetails();
-        let error = Api.createError(startResponse, errorDetails);
+        let error = this.api.createError(startResponse, errorDetails);
 
         if (error) {
             return this.createTaskResult({ error, playerId })
         }
 
         await delay(1000);
-        const response = await Api.call(authData, { "method": "pvp.battle.fight", "args": { "deck": 1 } });
-        error = Api.createError(response, errorDetails);
+        const response = await this.api.apiCall(authData, { "method": "pvp.battle.fight", "args": { "deck": 1 } });
+        error = this.api.createError(response, errorDetails);
 
-        const data = response.data as PvpFightBattleData;
+        const data = this.parser.parse(response.data);
 
         const resources = new GameResources<SmutstoneResources>();
         resources.set(SmutstoneResources.duel_points, (data.pointsGain || 0));
@@ -182,23 +181,5 @@ class PvpBattleFightTask extends SmutstoneTask<PvpFightBattleData> {
         return this.createTaskResult({ error, playerId, resources: resources.getData(), data });
     }
 }
-
-type PvpFightBattleData = {
-    chest?: DuelsChestData
-    result: {
-        result: string
-    }
-    starChest: { stars: number, last: number, league: number }
-    pointsGain: number
-}
-
-type DuelsData = {
-    chests: DuelsChestData[]
-    points: number
-    starChest: { stars: number, last: number, league: number }
-    slots: number
-}
-
-type DuelsChestData = { added: number, rarity: number, id: number, league: number }
 
 const CHEST_TIMES = { 1: { time: 27e5 }, 2: { time: 108e5 }, 3: { time: 432e5 }, 4: { time: 1728e5 } } as Dictionary<{ time: number }>

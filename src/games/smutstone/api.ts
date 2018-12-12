@@ -2,11 +2,9 @@
 // const debug = require('debug')('gamebot:smutstone:api');
 
 import { Dictionary } from "../../utils";
-import got = require("got");
-import { parse as parseCookie } from 'cookie';
 import { AuthData } from "./data/auth-data";
-import { GamebotError, GAMEBOT_ERROR_CODES, GamebotErrorDetails } from "../../errors";
 import * as FormData from 'form-data';
+import { GameApi, GameApiRootResponse, GameApiRequestParams, GameApiResponse, serializeCookies } from "../../game-api";
 
 export type ApiResponse = {
     ok: boolean
@@ -15,90 +13,59 @@ export type ApiResponse = {
     statusCode?: number
 }
 
-export class Api {
-    static async gamePage(auth: string | AuthData) {
-        const headers: Dictionary<string> = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
-            'Accept-Language': 'ro,en-US;q=0.9,en;q=0.8,cs;q=0.7,es;q=0.6,hu;q=0.5,it;q=0.4,lt;q=0.3,ru;q=0.2,sk;q=0.1,uk;q=0.1,pl;q=0.1,bg;q=0.1,mo;q=0.1',
-        }
+export class SmutstoneApi extends GameApi<AuthData> {
 
-        const cookieData: Dictionary<string> = typeof auth === 'string' ? { cook: auth } : auth;
-
-        headers.Cookie = serializeCookies(cookieData);
-
-        const response = await got('https://smutstone.com/', { headers });
-
-        return response;
+    gamePage(authData: AuthData) {
+        return this.request('https://smutstone.com/', { method: 'GET' }, authData);
     }
 
-    static async call(authData: AuthData, data: any): Promise<ApiResponse> {
-        let headers: Dictionary<string> = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
-            'Accept-Language': 'ro,en-US;q=0.9,en;q=0.8,cs;q=0.7,es;q=0.6,hu;q=0.5,it;q=0.4,lt;q=0.3,ru;q=0.2,sk;q=0.1,uk;q=0.1,pl;q=0.1,bg;q=0.1,mo;q=0.1',
-            'x-csrftoken': authData.csrftoken,
-            Origin: 'https://smutstone.com',
-            Referer: 'https://smutstone.com/',
-            Host: 'smutstone.com',
+    async apiCall(authData: AuthData, data: any) {
+        const params: GameApiRequestParams = { method: 'POST' };
+        const form = new FormData();
+        data.v = 26;
+        form.append('data', JSON.stringify(data));
+        params.body = form;
+
+        params.headers = Object.assign(form.getHeaders(), params.headers);
+
+        return await this.request('https://smutstone.com/api/', params, authData);
+    }
+
+    protected prepareRequestParams(_url: string, params: GameApiRequestParams, authData: AuthData): GameApiRequestParams {
+        params.headers = params.headers || {};
+        params.headers.Cookie = serializeCookies(authData);
+
+        if (authData.csrftoken) {
+            params.headers['x-csrftoken'] = authData.csrftoken;
+            params.headers.Origin = 'https://smutstone.com';
+            params.headers.Referer = 'https://smutstone.com/';
+            params.headers.Host = 'smutstone.com';
         }
 
-        data.v = 26;
-
-        headers.Cookie = serializeCookies(authData);
-        const form = new FormData();
-        form.append('data', JSON.stringify(data));
-
-        headers = Object.assign(form.getHeaders(), headers);
-
-        const response = await got('https://smutstone.com/api/', { headers, body: form, method: 'POST' });
-
-        // console.log('typeof body', typeof response.body);
-
-        const body = JSON.parse(response.body);
-
-        // console.log('body', body);
-
-        const ok = body && body.result === 'ok';
+        return params;
+    }
+    protected formatApiResponse(apiResponse: GameApiRootResponse): GameApiResponse {
+        let ok = true;
+        let body: any;
+        try {
+            body = apiResponse.body && JSON.parse(apiResponse.body);
+            ok = body && body.result === 'ok';
+        } catch (e) {
+            ok = false;
+        }
 
         return {
             ok,
-            data: body && body.response || undefined,
-            headers: response.headers,
-            statusCode: response.statusCode,
+            data: body && body.response || body || apiResponse.body,
+            headers: apiResponse.headers,
+            statusCode: apiResponse.statusCode,
         }
     }
 
-    static createError(response: ApiResponse, details: GamebotErrorDetails, defaultMessage?: string, defaultStatusCode?: number) {
-        if (response.ok) {
-            return undefined;
+    parseErrorMessage(response: GameApiResponse): string | undefined {
+        const data = response.data;//typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+        if (data && typeof data.error === 'string') {
+            return data.error;
         }
-        let code: GAMEBOT_ERROR_CODES = GAMEBOT_ERROR_CODES.UNKNOWN_ERROR;
-        let message = response.data && response.data.error;
-
-        const statusCode = response.statusCode;
-
-        if (statusCode) {
-            if (statusCode >= 400 && statusCode < 500) {
-                code = GAMEBOT_ERROR_CODES.API_400_ERROR;
-            } else if (statusCode >= 500) {
-                code = GAMEBOT_ERROR_CODES.API_500_ERROR;
-            }
-        }
-
-        return new GamebotError(code, message || defaultMessage || 'Unknown', details, statusCode || defaultStatusCode || 500);
     }
-}
-
-export function serializeCookies(data: Dictionary<string>) {
-    return Object.keys(data).reduce<string[]>((items, key) => {
-        items.push(`${key}=${encodeURIComponent(data[key])}`);
-        return items;
-    }, []).join(';');
-}
-
-export function parseSetCookie(setCookie: string[]): Dictionary<string> {
-    return setCookie
-        .map(value => parseCookie(value))
-        .reduce<Dictionary<string>>((dic, item) => Object.assign(dic, item), {});
 }
