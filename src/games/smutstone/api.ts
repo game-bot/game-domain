@@ -5,7 +5,7 @@ import { Dictionary } from "../../utils";
 import got = require("got");
 import { parse as parseCookie } from 'cookie';
 import { AuthData } from "./data/auth-data";
-import { GamebotError, GAMEBOT_ERROR_CODES } from "../../errors";
+import { GamebotError, GAMEBOT_ERROR_CODES, GamebotErrorDetails } from "../../errors";
 import * as FormData from 'form-data';
 
 export type ApiResponse = {
@@ -43,6 +43,8 @@ export class Api {
             Host: 'smutstone.com',
         }
 
+        data.v = 26;
+
         headers.Cookie = serializeCookies(authData);
         const form = new FormData();
         form.append('data', JSON.stringify(data));
@@ -51,7 +53,11 @@ export class Api {
 
         const response = await got('https://smutstone.com/api/', { headers, body: form, method: 'POST' });
 
+        // console.log('typeof body', typeof response.body);
+
         const body = JSON.parse(response.body);
+
+        // console.log('body', body);
 
         const ok = body && body.result === 'ok';
 
@@ -61,6 +67,26 @@ export class Api {
             headers: response.headers,
             statusCode: response.statusCode,
         }
+    }
+
+    static createError(response: ApiResponse, details: GamebotErrorDetails, defaultMessage?: string, defaultStatusCode?: number) {
+        if (response.ok) {
+            return undefined;
+        }
+        let code: GAMEBOT_ERROR_CODES = GAMEBOT_ERROR_CODES.UNKNOWN_ERROR;
+        let message = response.data && response.data.error;
+
+        const statusCode = response.statusCode;
+
+        if (statusCode) {
+            if (statusCode >= 400 && statusCode < 500) {
+                code = GAMEBOT_ERROR_CODES.API_400_ERROR;
+            } else if (statusCode >= 500) {
+                code = GAMEBOT_ERROR_CODES.API_500_ERROR;
+            }
+        }
+
+        return new GamebotError(code, message || defaultMessage || 'Unknown', details, statusCode || defaultStatusCode || 500);
     }
 }
 
@@ -75,15 +101,4 @@ export function parseSetCookie(setCookie: string[]): Dictionary<string> {
     return setCookie
         .map(value => parseCookie(value))
         .reduce<Dictionary<string>>((dic, item) => Object.assign(dic, item), {});
-}
-
-export function createErrorFromApiResponse(response: ApiResponse) {
-    if (response.ok) {
-        return undefined;
-    }
-    let code: GAMEBOT_ERROR_CODES = GAMEBOT_ERROR_CODES.API_500_ERROR;
-
-    // console.log(response);
-
-    return new GamebotError(code, '')
 }

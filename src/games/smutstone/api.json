@@ -1,0 +1,597 @@
+{
+  "pvp.battle.start": {
+    "input": {
+      "method": "pvp.battle.start",
+      "args": {},
+      "v": 25
+    },
+    "output": {
+      "response": {
+        "enemy": {
+          "exp": 185187,
+          "cardGame": {
+            "cards": [
+              {
+                "stones": [],
+                "cardId": 10,
+                "level": 12,
+                "evolution": {
+                  "currentStage": 3
+                },
+                "dupes": 0,
+                "id": 1
+              },
+              {
+                "stones": [],
+                "cardId": 48,
+                "level": 8,
+                "evolution": {
+                  "currentStage": 1
+                },
+                "dupes": 0,
+                "id": 2
+              },
+              {
+                "stones": [],
+                "cardId": 7,
+                "level": 12,
+                "evolution": {
+                  "currentStage": 3
+                },
+                "dupes": 0,
+                "id": 3
+              },
+              {
+                "stones": [],
+                "cardId": 45,
+                "level": 5,
+                "evolution": {
+                  "currentStage": 2
+                },
+                "dupes": 0,
+                "id": 4
+              },
+              {
+                "stones": [],
+                "cardId": 126,
+                "level": 6,
+                "evolution": {
+                  "currentStage": 2
+                },
+                "dupes": 0,
+                "id": 5
+              },
+              {
+                "stones": [],
+                "cardId": 117,
+                "level": 11,
+                "evolution": {
+                  "currentStage": 2
+                },
+                "dupes": 0,
+                "id": 6
+              },
+              {
+                "stones": [],
+                "cardId": 20,
+                "level": 12,
+                "evolution": {
+                  "currentStage": 3
+                },
+                "dupes": 0,
+                "id": 7
+              }
+            ],
+            "decks": [
+              {
+                "cardIds": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7
+                ]
+              }
+            ]
+          },
+          "voice": null,
+          "_name": "punchara",
+          "_avatar_big": {
+            "@2x": "__48f5/img/avatar/anonymous__195@2x.jpg",
+            "@1x": "__8f70/img/avatar/anonymous__195@1x.jpg"
+          }
+        }
+      },
+      "result": "ok"
+    }
+  },
+  "pvp.battle.fight": {
+    "input": {
+      "method": "pvp.battle.fight",
+      "args": {
+        "deck": 1
+      },
+      "v": 25
+    },
+    "output": {
+      "response": {
+        "result": {
+          "result": "won"
+        },
+        "starChest": {
+          "last": 5506862,
+          "league": 0,
+          "stars": 0
+        },
+        "log": [
+          {
+            "rival": {
+              "me": false,
+              "dmg": 320,
+              "card": 2,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 196,
+              "card": 137675918,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 203,
+              "card": 5,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 351,
+              "card": 137675920,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 227,
+              "card": 4,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 212,
+              "card": 137670332,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 320,
+              "card": 2,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 196,
+              "card": 137675918,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 203,
+              "card": 5,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 351,
+              "card": 137675920,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 227,
+              "card": 4,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 212,
+              "card": 137670332,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 320,
+              "card": 2,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 196,
+              "card": 137675918,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 203,
+              "card": 5,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 351,
+              "card": 137675920,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 227,
+              "card": 4,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 212,
+              "card": 137670332,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 320,
+              "card": 2,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 196,
+              "card": 137675918,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 480,
+              "card": 5,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 351,
+              "card": 146839350,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 227,
+              "card": 4,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 212,
+              "card": 137670332,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 320,
+              "card": 3,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 232,
+              "card": 137675918,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 320,
+              "card": 6,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 378,
+              "card": 146839350,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 389,
+              "card": 4,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 141,
+              "card": 139118410,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 372,
+              "card": 3,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 232,
+              "card": 138251319,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 320,
+              "card": 6,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 378,
+              "card": 146839350,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 389,
+              "card": 1,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 145,
+              "card": 139118410,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 372,
+              "card": 3,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 232,
+              "card": 138251319,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 173,
+              "card": 7,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 261,
+              "card": 137571841,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 389,
+              "card": 1,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 145,
+              "card": 139118410,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 248,
+              "hit": "hero"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 173,
+              "card": 7,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 261,
+              "card": 137571841,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 389,
+              "card": 1,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 145,
+              "card": 139118410,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 248,
+              "hit": "hero"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 173,
+              "card": 7,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 261,
+              "card": 137571841,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 389,
+              "card": 1,
+              "hit": "card"
+            },
+            "me": {
+              "me": true,
+              "dmg": 145,
+              "card": 139118410,
+              "hit": "card"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 248,
+              "hit": "hero"
+            }
+          },
+          {
+            "me": {
+              "me": true,
+              "dmg": 261,
+              "hit": "hero"
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 389,
+              "hit": "hero"
+            }
+          }
+        ],
+        "battle": {
+          "mode": 2,
+          "enemy": {
+            "cards": [
+              2,
+              5,
+              4
+            ],
+            "cardsQueue": [
+              3,
+              6,
+              1,
+              7
+            ],
+            "grave": [],
+            "hp": 987
+          },
+          "turn": 0,
+          "result": null,
+          "me": {
+            "cards": [
+              137675918,
+              137675920,
+              137670332
+            ],
+            "cardsQueue": [
+              146839350,
+              139118410,
+              138251319,
+              137571841
+            ],
+            "grave": [],
+            "hp": 948
+          }
+        },
+        "pointsGain": 8,
+        "chest": {
+          "league": 7,
+          "added": 5511392,
+          "rarity": 1,
+          "id": 827
+        }
+      },
+      "result": "ok"
+    }
+  },
+  "pvp.chest.claim": {
+    "input": {
+      "method": "pvp.chest.claim",
+      "args": {
+        "id": 828,
+        "unlock": true
+      },
+      "v": 26
+    },
+    "output": {
+      "response": {
+        "unlocked": false,
+        "reward": {
+          "cards": [
+            [
+              15,
+              null,
+              null,
+              7
+            ]
+          ],
+          "r": {
+            "denier": 4
+          },
+          "c": {
+            "PVP_CC": 1
+          },
+          "p": {
+            "se": 4,
+            "ny": 4
+          }
+        }
+      },
+      "result": "ok"
+    }
+  }
+}

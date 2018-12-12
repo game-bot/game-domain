@@ -1,4 +1,4 @@
-const debug = require('debug')('gamebot:smutstone:job');
+// const debug = require('debug')('gamebot:smutstone:job');
 
 import { SmutstoneJob } from "../smutstone-job";
 import { GameJobInfo } from "../../../game-job-info";
@@ -6,10 +6,11 @@ import { Player } from "../../../player";
 import gameInfo from "../game-info";
 import { IPlayerDataProvider } from "../../../data/player-data-provider";
 import { AuthData } from "../data/auth-data";
-import { Api, createErrorFromApiResponse } from "../api";
+import { Api } from "../api";
 import { SmutstoneTask } from "../smutstone-task";
 import { GameTaskResult } from "../../../game-task";
 import { UserData } from "../data/user-data";
+import { createGameResourcesFromRewards, SmutstoneResources } from "../resources";
 
 export const jobInfo: GameJobInfo = {
     id: 'open-bronze-box',
@@ -33,13 +34,13 @@ export class OpenBronzeBoxJob extends SmutstoneJob {
         const timeDiff = boxTime + 28800 - (userData.gameTime / 1000);
 
         if (timeDiff > 0) {
-            debug(`Too erly: ${timeDiff}`);
-            return {
-                ok: false
-            }
+            return this.createJobResult({
+                playerId: player.id,
+                status: 'waiting',
+            })
         }
 
-        return this.executeTasks(player, authData, [this.task]);
+        return this.createJobResultFromTaskResult(await this.task.execute(player, authData));
     }
 }
 
@@ -48,14 +49,12 @@ class OpenBronzeBoxTask extends SmutstoneTask {
         super(jobInfo);
     }
 
-    async innerExecute(_player: Player, authData: AuthData): Promise<GameTaskResult> {
-        const response = await Api.call(authData, { "method": "lootbox.open", "args": { "typeId": 6000 }, "v": 25 });
-        const error = createErrorFromApiResponse(response);
+    async innerExecute(player: Player, authData: AuthData): Promise<GameTaskResult<SmutstoneResources>> {
+        const response = await Api.call(authData, { "method": "lootbox.open", "args": { "typeId": 6000 } });
+        const error = Api.createError(response, this.createErrorDetails());
+        const data = response.data;
+        const resources = data && data.rewards && createGameResourcesFromRewards(data.rewards).getData() || undefined;
 
-        return {
-            continue: true,
-            ok: response.ok,
-            error,
-        }
+        return this.createTaskResult({ error, data, resources, playerId: player.id });
     }
 }

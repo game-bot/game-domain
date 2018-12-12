@@ -2,13 +2,18 @@ const debug = require('debug')('gamebot');
 
 import { Player } from "./player";
 import { GameJobInfo } from "./game-job-info";
-import { IGameTask } from "./game-task";
+import { GameTaskResultStatus, GameTaskResult } from "./game-task";
 import { IPlayerDataProvider } from "./data/player-data-provider";
-import { GamebotError } from "./errors";
+import { GamebotError, GamebotErrorDetails } from "./errors";
+import { GameResourcesData, GameResources } from "./game-resources";
 
 export type GameJobResult = {
-    ok: boolean
+    gameId: string
+    playerId: string
+    jobId: string
+    status: GameTaskResultStatus
     error?: GamebotError
+    resources?: GameResourcesData
 }
 
 export interface IGameJob {
@@ -26,24 +31,66 @@ export abstract class GameJob<AD> implements IGameJob {
         return result;
     }
 
-    protected async executeTasks(player: Player, authData: AD, tasks: IGameTask<AD>[]) {
-        const result: GameJobResult = {
-            ok: true
-        }
+    protected async createJobResultFromTaskResults(taskResults: GameTaskResult[]) {
 
-        for (const task of tasks) {
-            const taskResult = await task.execute(player, authData);
-            if (!taskResult.ok) {
-                if (!taskResult.continue) {
-                    result.ok = false;
-                    result.error = taskResult.error;
-                    break;
-                }
-            }
+        const result = this.createJobResultFromTaskResult(taskResults[taskResults.length - 1]);
+
+        if (taskResults.length > 0) {
+            const resourcesList = taskResults.map(item => item.resources).filter(item => !!item) as GameResourcesData[];
+            const resources = GameJob.mergeGameResources(resourcesList);
+            result.resources = resources.getData();
         }
 
         return result;
     }
 
+    static mergeGameResources<R extends string=string>(resources: GameResourcesData[]) {
+        const total = new GameResources<R>();
+
+        for (const item of resources) {
+            Object.keys(item).forEach(key => {
+                total.inc(key as R, ((<any>item)[key] || 0));
+            });
+        }
+
+        return total;
+    }
+
     protected abstract innerExecute(player: Player): Promise<GameJobResult>
+
+    protected createJobResultFromTaskResult(taskResult: GameTaskResult) {
+        return this.createJobResult(taskResult);
+    }
+
+    protected createJobResult({ playerId, error, resources, status }:
+        {
+            playerId: string,
+            error?: GamebotError,
+            resources?: GameResourcesData,
+            status?: GameTaskResultStatus
+        }) {
+
+        status = status || (error ? 'error' : 'done');
+
+        const result: GameJobResult = {
+            jobId: this.info.id,
+            gameId: this.info.gameId,
+            status,
+            playerId,
+            error,
+            resources,
+        }
+
+        return result;
+    }
+
+    protected createErrorDetails(data?: any) {
+        const details: GamebotErrorDetails = {
+            gameId: this.info.gameId,
+            jobId: this.info.id,
+            data,
+        };
+
+        return details;
+    }
 }

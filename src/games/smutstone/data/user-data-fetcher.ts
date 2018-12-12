@@ -1,4 +1,4 @@
-const debug = require('debug')('gamebot:smutstone:data');
+// const debug = require('debug')('gamebot:smutstone:data');
 
 import { PlayerDataFetcher } from "../../../data/player-data-fetcher";
 import { Player } from "../../../player";
@@ -26,8 +26,6 @@ export class UserDataFetcher extends PlayerDataFetcher<UserData> {
         const jsonString = execResult[1].replace(/\\"/g, '\"')
         const jsonData = JSON.parse(jsonString);
         const data = pickDeep(jsonData, UserDataPickFields) as UserData;
-
-        debug(`got userData=${JSON.stringify(data)}`);
 
         return data;
     }

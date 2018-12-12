@@ -6,8 +6,39 @@ export enum GAMEBOT_ERROR_CODES {
     API_DATA_PARSE_ERROR = 'API_DATA_PARSE_ERROR',
 }
 
+export type GamebotErrorDetails = {
+    gameId: string
+    jobId?: string
+    taskId?: string
+    data?: any
+}
+
 export class GamebotError extends Error {
-    constructor(readonly code: GAMEBOT_ERROR_CODES, message: string, readonly data?: any) {
+    constructor(readonly code: GAMEBOT_ERROR_CODES, message: string, readonly details: GamebotErrorDetails, readonly statusCode: number) {
         super(message);
+    }
+}
+
+export class GamebotUnknownError extends GamebotError {
+    constructor(message: string, details: GamebotErrorDetails, statusCode: number) {
+        super(GAMEBOT_ERROR_CODES.UNKNOWN_ERROR, message, details, statusCode);
+    }
+}
+
+export class GamebotApi400Error extends GamebotError {
+    constructor(message: string, details: GamebotErrorDetails, statusCode: number = 400) {
+        super(GAMEBOT_ERROR_CODES.API_400_ERROR, message, details, statusCode);
+    }
+}
+
+export class GamebotApi500Error extends GamebotError {
+    constructor(message: string, details: GamebotErrorDetails, statusCode: number = 500) {
+        super(GAMEBOT_ERROR_CODES.API_500_ERROR, message, details, statusCode);
+    }
+}
+
+export class GamebotApiDataParseError extends GamebotError {
+    constructor(message: string, details: GamebotErrorDetails, statusCode: number = 500) {
+        super(GAMEBOT_ERROR_CODES.API_DATA_PARSE_ERROR, message, details, statusCode);
     }
 }
