@@ -10,7 +10,7 @@ import { SmutstoneApi } from "../api";
 import { SmutstoneApiTask } from "../smutstone-task";
 import { UserData } from "../data/user-data";
 import { createGameResourcesFromRewards } from "../resources";
-import { ToolboxApiDataParser, ToolboxApiData } from "../api/toolbox-data";
+import { ToolboxApiDataParser, ToolboxApiData } from "../data/api/toolbox-data";
 
 export const jobInfo: GameJobInfo = {
     id: 'open-bronze-box',

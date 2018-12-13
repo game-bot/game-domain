@@ -1,6 +1,6 @@
-import { DataParser } from "../../../data/data-parser";
 import * as Joi from 'joi';
-import { Dictionary } from "../../../utils";
+import { DataParser } from '../../../../data/data-parser';
+import { Dictionary } from '../../../../utils';
 
 export type PvpApiData = {
     chests: PvpChestApiData[]
@@ -58,8 +58,8 @@ const starChestSchema = Joi.object().keys({
 });
 
 const fightBattleSchema = Joi.object().keys({
-    chest: chestSchema,
-    result:Joi.object().keys({
+    chest: chestSchema.allow(null),
+    result: Joi.object().keys({
         result: Joi.string().required(),
     }).required(),
     starChest: starChestSchema.required(),

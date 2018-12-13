@@ -645,5 +645,133 @@
       },
       "result": "ok"
     }
+  },
+  "cards.battle.fight": {
+    "input": {
+      "method": "cards.battle.fight",
+      "args": {
+        "location": 1,
+        "mission": 11,
+        "deck": 1
+      },
+      "batch": [
+        {
+          "method": "user.log",
+          "args": {
+            "action": "rating:rank",
+            "params": {
+              "k": "",
+              "o": 2,
+              "n": 1
+            }
+          }
+        }
+      ],
+      "v": 26
+    },
+    "output": {
+      "response": {
+        "s": 3,
+        "log": [
+          {
+            "me": {
+              "me": true,
+              "dmg": 46,
+              "hit": "card",
+              "card": 139118410
+            },
+            "rival": {
+              "me": false,
+              "dmg": 584,
+              "hit": "card",
+              "card": 1
+            }
+          },
+          {
+            "me": {
+              "me": true,
+              "dmg": 33,
+              "hit": "card",
+              "card": 137571841
+            },
+            "rival": {
+              "me": false,
+              "dmg": 180,
+              "hit": "card",
+              "card": 2
+            }
+          },
+          {
+            "me": {
+              "me": true,
+              "dmg": 46,
+              "hit": "card",
+              "card": 137670332
+            },
+            "rival": {
+              "me": false,
+              "dmg": 151,
+              "hit": "card",
+              "card": 3
+            }
+          },
+          {
+            "rival": {
+              "me": false,
+              "dmg": 389,
+              "hit": "hero"
+            }
+          }
+        ],
+        "result": {
+          "result": "won"
+        },
+        "rewards": [
+          {
+            "i": [
+              [
+                2061,
+                1
+              ]
+            ],
+            "r": {
+              "gold": 1103
+            }
+          },
+          {
+            "p": 5
+          }
+        ],
+        "battle": {
+          "me": {
+            "grave": [],
+            "hp": 948,
+            "cards": [
+              139118410,
+              137571841,
+              137670332
+            ],
+            "cardsQueue": []
+          },
+          "result": null,
+          "mode": 1,
+          "enemy": {
+            "grave": [],
+            "hp": 237,
+            "cards": [
+              1,
+              2,
+              3
+            ],
+            "cardsQueue": []
+          },
+          "turn": 0
+        }
+      },
+      "result": "ok",
+      "batch": [
+        "ok"
+      ]
+    }
   }
 }

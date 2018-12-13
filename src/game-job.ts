@@ -39,6 +39,9 @@ export abstract class GameJob<AD> implements IGameJob {
     }
 
     protected async createJobResultFromTaskResults(taskResults: GameTaskResult[]) {
+        if (taskResults.length === 0) {
+            throw new Error(`taskResults.length must be > 0`);
+        }
 
         const result = this.createJobResultFromTaskResult(taskResults[taskResults.length - 1]);
 

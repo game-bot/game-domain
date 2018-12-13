@@ -14,7 +14,7 @@ import { delay, Dictionary } from "../../../utils";
 import { UserData } from "../data/user-data";
 import { createGameResourcesFromRewards, SmutstoneResources } from "../resources";
 import { GameResources } from "../../../game-resources";
-import { PvpApiDataParser, PvpApiData, PvpClaimChestApiData, PvpClaimChestApiDataParser, PvpFightBattleApiData, PvpFightBattleApiDataParser, PvpChestApiData } from "../api/pvp-data";
+import { PvpApiDataParser, PvpApiData, PvpClaimChestApiData, PvpClaimChestApiDataParser, PvpFightBattleApiData, PvpFightBattleApiDataParser, PvpChestApiData } from "../data/api/pvp-data";
 
 export const jobInfo: GameJobInfo = {
     id: 'duels',
@@ -53,6 +53,10 @@ export class DuelsJob extends SmutstoneJob {
         const taskResults = await this.claimChests(player, authData, duelsData, userData);
 
         await this.fillChests(player, authData, duelsData, taskResults);
+
+        if (taskResults.length === 0) {
+            return this.createJobResult({ status: 'waiting', playerId });
+        }
 
         return this.createJobResultFromTaskResults(taskResults);
     }

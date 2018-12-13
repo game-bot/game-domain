@@ -14,7 +14,7 @@ export type UserData = {
         denier: number
         energy_set_time: number
         energy: number
-        gems: number
+        gems?: number
         gold: number
     }
     gameTime: number
@@ -74,7 +74,7 @@ const userDataSchema = Joi.object().keys({
         denier: Joi.number().integer(),
         energy_set_time: Joi.number().integer(),
         energy: Joi.number().integer().required(),
-        gems: Joi.number().integer().required(),
+        gems: Joi.number().integer(),
         gold: Joi.number().integer().required(),
     }).required(),
     gameTime: Joi.number().integer().required(),

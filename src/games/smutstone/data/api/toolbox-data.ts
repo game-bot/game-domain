@@ -1,5 +1,5 @@
-import { DataParser } from "../../../data/data-parser";
 import * as Joi from 'joi';
+import { DataParser } from '../../../../data/data-parser';
 
 export type ToolboxApiData = {
     rewards: any[]
