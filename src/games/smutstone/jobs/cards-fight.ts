@@ -31,7 +31,7 @@ export class CardsBattleFightJob extends SmutstoneJob {
         const authData = (await this.authProvider.get(player)).data;
         const userData = (await this.userDataProvider.get(player)).data;
 
-        if (userData.resources.energy < 1) {
+        if (userData.resources.energy < 50) {
             return this.createJobResult({
                 playerId: player.id,
                 status: 'waiting',
