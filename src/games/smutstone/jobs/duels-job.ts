@@ -19,7 +19,7 @@ import { PvpApiDataParser, PvpApiData, PvpClaimChestApiData, PvpClaimChestApiDat
 export const jobInfo: GameJobInfo = {
     id: 'duels',
     name: 'Duels',
-    interval: '1h',
+    interval: '30m',
     gameId: gameInfo.id,
 }
 

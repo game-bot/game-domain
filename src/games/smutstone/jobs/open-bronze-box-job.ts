@@ -15,7 +15,7 @@ import { ToolboxApiDataParser, ToolboxApiData } from "../data/api/toolbox-data";
 export const jobInfo: GameJobInfo = {
     id: 'open-bronze-box',
     name: 'Open Bronze Box',
-    interval: '6h',
+    interval: '4h',
     gameId: gameInfo.id,
 }
 

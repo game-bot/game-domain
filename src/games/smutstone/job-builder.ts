@@ -9,6 +9,7 @@ import { AuthDataProvider } from "./data/auth-data-provider";
 import { UserDataProvider } from "./data/user-data-provider";
 import { OpenBronzeBoxJob } from "./jobs/open-bronze-box-job";
 import { SmutstoneApi } from "./api";
+import { CardsBattleFightJob } from "./jobs/cards-fight";
 
 export class SmutstoneJobBuilder {
     private authProvider: IPlayerDataProvider<AuthData>
@@ -23,6 +24,7 @@ export class SmutstoneJobBuilder {
         switch (jobInfo.id) {
             case 'duels': return new DuelsJob(this.api, this.authProvider, this.userDataProvider);
             case 'open-bronze-box': return new OpenBronzeBoxJob(this.api, this.authProvider, this.userDataProvider);
+            case 'cards-battle-fight': return new CardsBattleFightJob(this.api, this.authProvider, this.userDataProvider);
         }
 
         throw new Error(`Invalid job id: ${jobInfo.id}`);

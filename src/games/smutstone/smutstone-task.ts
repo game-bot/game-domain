@@ -18,9 +18,9 @@ export abstract class SmutstoneApiTask<DATA> extends GameTask<AuthData, DATA> {
         super(info)
     }
 
-    protected async innerExecute(player: Player, authData: AuthData) {
+    protected async innerExecute(player: Player, authData: AuthData, moreData?: any) {
         const playerId = player.id;
-        const response = await this.api.apiCall(authData, this.createApiData(player));
+        const response = await this.api.apiCall(authData, this.createApiData(player, moreData));
         const error = this.api.createError(response, this.createErrorDetails());
         if (error) {
             return this.createTaskResult({ error, playerId });
@@ -31,6 +31,6 @@ export abstract class SmutstoneApiTask<DATA> extends GameTask<AuthData, DATA> {
         return this.createTaskResult({ error, data, resources, playerId });
     }
 
-    protected abstract createApiData(player: Player): any
+    protected abstract createApiData(player: Player, moreData?: any): any
     protected abstract createResources(data: DATA): GameResourcesData | undefined
 }
