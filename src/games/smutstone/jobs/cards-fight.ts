@@ -16,7 +16,7 @@ import { getRandomIntInclusive } from "../../../utils";
 export const jobInfo: GameJobInfo = {
     id: 'cards-battle-fight',
     name: 'Cards Battle Fight',
-    interval: '30m',
+    interval: '15m',
     gameId: gameInfo.id,
 }
 

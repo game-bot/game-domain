@@ -14,6 +14,9 @@ export type ApiResponse = {
 }
 
 export class SmutstoneApi extends GameApi<AuthData> {
+    constructor(private version: number = 27, defaultHeaders?: Dictionary<string>) {
+        super(defaultHeaders);
+    }
 
     gamePage(authData: AuthData) {
         return this.request('https://smutstone.com/', { method: 'GET' }, authData);
@@ -22,7 +25,7 @@ export class SmutstoneApi extends GameApi<AuthData> {
     async apiCall(authData: AuthData, data: any) {
         const params: GameApiRequestParams = { method: 'POST' };
         const form = new FormData();
-        data.v = 26;
+        data.v = this.version;
         form.append('data', JSON.stringify(data));
         params.body = form;
 
@@ -65,6 +68,9 @@ export class SmutstoneApi extends GameApi<AuthData> {
     parseErrorMessage(response: GameApiResponse): string | undefined {
         const data = response.data;//typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
         if (data && typeof data.error === 'string') {
+            if (/new version available/.test(data.error)) {
+                this.version++;
+            }
             return data.error;
         }
     }
