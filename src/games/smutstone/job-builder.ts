@@ -1,32 +1,37 @@
-import { IPlayerDataRepository } from "../../data/player-data-repository";
-import { GameJobInfo } from "../../game-job-info";
+import { IPlayerDataRepository } from "../../repositories/player-data-repository";
 import { IGameJob } from "../../game-job";
-import { DuelsJob } from "./jobs/duels-job";
-import { IPlayerDataProvider } from "../../data/player-data-provider";
-import { AuthData } from "./data/auth-data";
-import { UserData } from "./data/user-data";
 import { AuthDataProvider } from "./data/auth-data-provider";
 import { UserDataProvider } from "./data/user-data-provider";
-import { OpenBronzeBoxJob } from "./jobs/open-bronze-box-job";
 import { SmutstoneApi } from "./api";
-import { CardsBattleFightJob } from "./jobs/cards-fight";
+import { GameJobInfo } from "../../entities/game-job-info";
+
+interface JobConstructor {
+    new(api: SmutstoneApi, authData: AuthDataProvider, userData: UserDataProvider): IGameJob;
+}
 
 export class SmutstoneJobBuilder {
-    private authProvider: IPlayerDataProvider<AuthData>
-    private userDataProvider: IPlayerDataProvider<UserData>
+    private authProvider: AuthDataProvider
+    private userDataProvider: UserDataProvider
 
-    constructor(dataRepository: IPlayerDataRepository<any>, private api: SmutstoneApi) {
+    constructor(dataRepository: IPlayerDataRepository, private api: SmutstoneApi) {
         this.authProvider = new AuthDataProvider(dataRepository, api);
-        this.userDataProvider = new UserDataProvider(dataRepository, dataRepository, api);
+        this.userDataProvider = new UserDataProvider(dataRepository, api);
+    }
+
+    private getJobCreator(id: string) {
+        if (!/^[a-z0-9_-]+$/.test(id)) {
+            throw new Error(`Invalid job id: ${id}`);
+        }
+        return require(`./jobs/${id}.js`).default as JobConstructor
     }
 
     build(jobInfo: GameJobInfo): IGameJob {
-        switch (jobInfo.id) {
-            case 'duels': return new DuelsJob(this.api, this.authProvider, this.userDataProvider);
-            case 'open-bronze-box': return new OpenBronzeBoxJob(this.api, this.authProvider, this.userDataProvider);
-            case 'cards-battle-fight': return new CardsBattleFightJob(this.api, this.authProvider, this.userDataProvider);
+        const create = this.getJobCreator(jobInfo.id);
+
+        if (!create) {
+            throw new Error(`Invalid job id: ${jobInfo.id}`);
         }
 
-        throw new Error(`Invalid job id: ${jobInfo.id}`);
+        return new create(this.api, this.authProvider, this.userDataProvider);
     }
 }

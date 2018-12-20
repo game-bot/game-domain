@@ -1,15 +1,15 @@
 import * as Joi from 'joi';
-import { DataParser } from '../../../../data/data-parser';
-import { Dictionary } from '../../../../utils';
+import { EntityMapper } from '../../../../entities/entity-mapper';
+import { IDictionary } from '@gamebot/domain';
 
 export type CardsFightApiData = {
     result: {
         result: string
     }
-    rewards?: Dictionary<any>[]
+    rewards?: IDictionary<any>[]
 }
 
-export class CardsFightApiDataParser extends DataParser<CardsFightApiData> {
+export class CardsFightApiDataParser extends EntityMapper<CardsFightApiData> {
     constructor() {
         super(['result', 'rewards'], schema.required())
     }

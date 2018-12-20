@@ -1,12 +1,12 @@
 {
   "name": "@gamebot/game-domain",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Main game module",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
     "pretest": "npm run clean && npm run tsc",
-    "test": "ava --no-cache --verbose lib/**/*.test.js",
+    "test": "npm run validate-data && ava --no-cache --verbose lib/**/*.test.js",
     "posttest": "npm run clean-test-code",
     "tsc": "tsc",
     "tscw": "tsc -w",
@@ -14,7 +14,8 @@
     "postversion": "git push --follow-tags",
     "prepublishOnly": "npm run tsc && npm run clean-test-code",
     "clean": "rimraf ./lib",
-    "clean-test-code": "rimraf ./lib/**/*.test.js && rimraf ./lib/**/*.test.d.ts"
+    "clean-test-code": "rimraf ./lib/**/*.test.js && rimraf ./lib/**/*.test.d.ts",
+    "validate-data": "node ./lib/scripts/validate-data.js"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -41,6 +42,7 @@
     "@types/lodash": "^4.14.119",
     "@types/ms": "^0.7.30",
     "@types/node": "10.12.12",
+    "ajv": "^6.6.2",
     "ava": "^0.25.0",
     "debug": "^4.1.0",
     "rimraf": "^2.6.2",

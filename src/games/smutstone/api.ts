@@ -1,20 +1,20 @@
 
 // const debug = require('debug')('gamebot:smutstone:api');
 
-import { Dictionary } from "../../utils";
 import { AuthData } from "./data/auth-data";
 import * as FormData from 'form-data';
 import { GameApi, GameApiRootResponse, GameApiRequestParams, GameApiResponse, serializeCookies } from "../../game-api";
+import { IDictionary } from "@gamebot/domain";
 
 export type ApiResponse = {
     ok: boolean
     data?: any,
-    headers: Dictionary<string | string[] | undefined>
+    headers: IDictionary<string | string[] | undefined>
     statusCode?: number
 }
 
 export class SmutstoneApi extends GameApi<AuthData> {
-    constructor(private version: number = 27, defaultHeaders?: Dictionary<string>) {
+    constructor(private version: number = 28, defaultHeaders?: IDictionary<string>) {
         super(defaultHeaders);
     }
 

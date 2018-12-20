@@ -1,0 +1,36 @@
+[
+  {
+    "id": "smutstone",
+    "name": "Smutstone",
+    "description": "Browser based adult game",
+    "url": "https://smutstone.com",
+    "status": "active",
+    "createdAt": "2018-12-20T12:22:29.176Z",
+    "jobs": [
+      {
+        "id": "cards-random-fight",
+        "name": "Cards Random Fight",
+        "description": "Fight a random place",
+        "frequency": "30m",
+        "weight": 0,
+        "createdAt": "2018-12-20T12:22:29.176Z"
+      },
+      {
+        "id": "manage-duels",
+        "name": "Manage Duels",
+        "description": "Fight and open chests",
+        "frequency": "30m",
+        "weight": 0,
+        "createdAt": "2018-12-20T12:22:29.176Z"
+      },
+      {
+        "id": "open-bronze-box",
+        "name": "Open Bronze Box",
+        "description": "Open free bronse box",
+        "frequency": "8h",
+        "weight": 0,
+        "createdAt": "2018-12-20T12:22:29.176Z"
+      }
+    ]
+  }
+]

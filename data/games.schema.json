@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Games",
+  "description": "Games list",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "The unique identifier for a game",
+        "type": "string",
+        "pattern": "^([a-z][a-z0-9]*[_-]{0,1}[a-z0-9]+){2,32}$"
+      },
+      "name": {
+        "description": "Game name",
+        "type": "string",
+        "pattern": "^(([a-zA-Z0-9]+[. /+-]{0,1})+[a-zA-Z0-9]+){2,32}$"
+      },
+      "description": {
+        "description": "Game description",
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 100
+      },
+      "url": {
+        "description": "Game url",
+        "type": "string",
+        "format": "uri"
+      },
+      "createdAt": {
+        "description": "Game created at ISO date",
+        "type": "string",
+        "format": "date-time"
+      },
+      "jobs": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The unique identifier for a game job",
+              "type": "string",
+              "pattern": "^([a-z][a-z0-9]*[_-]{0,1}[a-z0-9]+){2,32}$"
+            },
+            "name": {
+              "description": "Job name",
+              "type": "string",
+              "pattern": "^(([a-zA-Z0-9]+[. /+-]{0,1})+[a-zA-Z0-9]+){2,32}$"
+            },
+            "description": {
+              "description": "Job description",
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 100
+            },
+            "createdAt": {
+              "description": "Game created at ISO date",
+              "type": "string",
+              "format": "date-time"
+            },
+            "frequency": {
+              "description": "Job frequency",
+              "type": "string",
+              "pattern": "^\\d+[mh]$"
+            },
+            "weight": {
+              "description": "Job weight",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "description",
+            "frequency",
+            "weight",
+            "createdAt"
+          ]
+        }
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "description",
+      "url",
+      "status",
+      "createdAt",
+      "jobs"
+    ]
+  }
+}

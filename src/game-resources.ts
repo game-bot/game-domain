@@ -1,6 +1,6 @@
-import { Dictionary } from "./utils";
+import { IDictionary } from "@gamebot/domain";
 
-export type GameResourcesData = Dictionary<number>
+export type GameResourcesData = IDictionary<number>
 
 export class GameResources<T extends string=string> {
     constructor(private data: GameResourcesData = {}) { }

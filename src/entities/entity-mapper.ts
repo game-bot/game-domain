@@ -1,18 +1,18 @@
 import { AnySchema, validate } from "joi";
 import { pickDeep } from "../utils";
 
-export type DataParserValidationResult<DATA> = {
+export type EntityMapperValidationResult<DATA> = {
     value: DATA
     error?: Error
 }
 
-export abstract class DataParser<DATA> {
+export abstract class EntityMapper<DATA> {
     constructor(private pickFields: string[], private validateSchema: AnySchema) {
 
     }
 
-    parse(data: any) {
-        const newData = pickDeep(data, this.pickFields);
+    map(data: any) {
+        const newData = pickDeep<any, DATA>(data, this.pickFields);
 
         const valid = this.validate(newData);
 
@@ -23,7 +23,7 @@ export abstract class DataParser<DATA> {
         return valid.value;
     }
 
-    validate(data: DATA): DataParserValidationResult<DATA> {
+    validate(data: DATA): EntityMapperValidationResult<DATA> {
         const result = validate<DATA>(data, this.validateSchema, { abortEarly: true, allowUnknown: true, stripUnknown: true });
 
         return {

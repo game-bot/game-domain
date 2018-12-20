@@ -1,30 +1,22 @@
 // const debug = require('debug')('gamebot:smutstone:job');
 
 import { SmutstoneJob } from "../smutstone-job";
-import { GameJobInfo } from "../../../game-job-info";
-import { Player } from "../../../player";
-import gameInfo from "../game-info";
-import { IPlayerDataProvider } from "../../../data/player-data-provider";
+import { Player } from "../../../player/player";
+import { IPlayerDataProvider } from "../../../player/player-data-provider";
 import { AuthData } from "../data/auth-data";
 import { SmutstoneApi } from "../api";
 import { SmutstoneApiTask } from "../smutstone-task";
 import { UserData } from "../data/user-data";
 import { createGameResourcesFromRewards } from "../resources";
 import { CardsFightApiData, CardsFightApiDataParser } from "../data/api/cards-fight-data";
-import { getRandomIntInclusive } from "../../../utils";
+import { getRandomIntInclusive } from "@gamebot/domain";
+import { GameJobInfo } from "../../../entities/game-job-info";
 
-export const jobInfo: GameJobInfo = {
-    id: 'cards-battle-fight',
-    name: 'Cards Battle Fight',
-    interval: '15m',
-    gameId: gameInfo.id,
-}
-
-export class CardsBattleFightJob extends SmutstoneJob {
+export default class CardsBattleFightJob extends SmutstoneJob {
     private task: CardsBattleFightTask
     constructor(api: SmutstoneApi, authProvider: IPlayerDataProvider<AuthData>, private userDataProvider: IPlayerDataProvider<UserData>) {
-        super(jobInfo, authProvider, api);
-        this.task = new CardsBattleFightTask(api);
+        super(__filename, authProvider, api);
+        this.task = new CardsBattleFightTask(this.info, api);
     }
 
     protected async innerExecute(player: Player) {
@@ -49,7 +41,7 @@ export class CardsBattleFightJob extends SmutstoneJob {
 }
 
 class CardsBattleFightTask extends SmutstoneApiTask<CardsFightApiData> {
-    constructor(api: SmutstoneApi) {
+    constructor(jobInfo: GameJobInfo, api: SmutstoneApi) {
         super(jobInfo, api, new CardsFightApiDataParser());
     }
 

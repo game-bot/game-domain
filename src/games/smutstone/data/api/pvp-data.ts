@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
-import { DataParser } from '../../../../data/data-parser';
-import { Dictionary } from '../../../../utils';
+import { EntityMapper } from '../../../../entities/entity-mapper';
+import { IDictionary } from '@gamebot/domain';
 
 export type PvpApiData = {
     chests: PvpChestApiData[]
@@ -12,7 +12,7 @@ export type PvpApiData = {
 export type PvpChestApiData = { added: number, rarity: number, id: number, league: number }
 export type PvpStarChestApiData = { stars: number, last: number, league: number }
 
-export class PvpApiDataParser extends DataParser<PvpApiData> {
+export class PvpApiDataParser extends EntityMapper<PvpApiData> {
     constructor() {
         super(['chests', 'points', 'starChest', 'slots'], pvpSchema.required())
     }
@@ -20,10 +20,10 @@ export class PvpApiDataParser extends DataParser<PvpApiData> {
 
 export type PvpClaimChestApiData = {
     unlocked: boolean
-    reward: Dictionary<any>
+    reward: IDictionary<any>
 }
 
-export class PvpClaimChestApiDataParser extends DataParser<PvpClaimChestApiData> {
+export class PvpClaimChestApiDataParser extends EntityMapper<PvpClaimChestApiData> {
     constructor() {
         super(['unlocked', 'reward'], claimChestSchema.required())
     }
@@ -38,7 +38,7 @@ export type PvpFightBattleApiData = {
     pointsGain: number
 }
 
-export class PvpFightBattleApiDataParser extends DataParser<PvpFightBattleApiData> {
+export class PvpFightBattleApiDataParser extends EntityMapper<PvpFightBattleApiData> {
     constructor() {
         super(['chest', 'result', 'starChest', 'pointsGain'], fightBattleSchema.required())
     }

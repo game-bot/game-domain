@@ -1,8 +1,9 @@
-import { PlayerDataFetcher } from "../../../data/player-data-fetcher";
-import { Player } from "../../../player";
+
+import { Player } from "../../../player/player";
 import { AuthData, AuthDataParser } from "./auth-data";
 import { SmutstoneApi } from "../api";
 import { parseSetCookie } from "../../../game-api";
+import { PlayerDataFetcher } from "../../../player/player-data-fetcher";
 
 export class AuthDataFetcher extends PlayerDataFetcher<AuthData, SmutstoneApi> {
     private parser: AuthDataParser
@@ -21,7 +22,7 @@ export class AuthDataFetcher extends PlayerDataFetcher<AuthData, SmutstoneApi> {
 
         const cookies = parseSetCookie(response.headers && response.headers["set-cookie"] as string[] || []);
 
-        const data: AuthData = this.parser.parse(cookies);
+        const data: AuthData = this.parser.map(cookies);
         data.cook = authData.cook;
 
         return data;

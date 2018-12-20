@@ -1,11 +1,12 @@
 const debug = require('debug')('gamebot');
 
-import { Player } from "./player";
-import { GameJobInfo } from "./game-job-info";
+import { Player } from "./player/player";
 import { GameTaskResultStatus, GameTaskResult } from "./game-task";
-import { IPlayerDataProvider } from "./data/player-data-provider";
+import { IPlayerDataProvider } from "./player/player-data-provider";
 import { GamebotError, GamebotErrorDetails } from "./errors";
 import { GameResourcesData, GameResources } from "./game-resources";
+import { dataGameJobByFile } from "./data";
+import { GameJobInfo } from "./entities/game-job-info";
 
 export type GameJobResult = {
     gameId: string
@@ -24,7 +25,15 @@ export interface IGameJob {
 }
 
 export abstract class GameJob<AD> implements IGameJob {
-    constructor(protected info: GameJobInfo, protected authProvider: IPlayerDataProvider<AD>) { }
+    protected info: GameJobInfo
+    constructor(jobFile: string, protected authProvider: IPlayerDataProvider<AD>) {
+        const info = dataGameJobByFile(jobFile);
+        if (!info) {
+            throw new Error(`Invalid job file path: ${jobFile}`);
+        }
+
+        this.info = info;
+    }
 
     async execute(player: Player): Promise<GameJobResult> {
         const jobName = this.constructor.name;

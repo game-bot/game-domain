@@ -1,10 +1,10 @@
-import { GameJobInfo } from "../../game-job-info";
 import { GameTask } from "../../game-task";
 import { AuthData } from "./data/auth-data";
 import { SmutstoneApi } from "./api";
-import { DataParser } from "../../data/data-parser";
-import { Player } from "../../player";
+import { EntityMapper } from "../../entities/entity-mapper";
+import { Player } from "../../player/player";
 import { GameResourcesData } from "../../game-resources";
+import { GameJobInfo } from "../../entities/game-job-info";
 
 
 export abstract class SmutstoneTask<RD=any> extends GameTask<AuthData, RD> {
@@ -14,7 +14,7 @@ export abstract class SmutstoneTask<RD=any> extends GameTask<AuthData, RD> {
 }
 
 export abstract class SmutstoneApiTask<DATA> extends GameTask<AuthData, DATA> {
-    constructor(info: GameJobInfo, protected api: SmutstoneApi, protected parser: DataParser<DATA>) {
+    constructor(info: GameJobInfo, protected api: SmutstoneApi, protected parser: EntityMapper<DATA>) {
         super(info)
     }
 
@@ -25,7 +25,7 @@ export abstract class SmutstoneApiTask<DATA> extends GameTask<AuthData, DATA> {
         if (error) {
             return this.createTaskResult({ error, playerId });
         }
-        const data = this.parser.parse(response.data);
+        const data = this.parser.map(response.data);
         const resources = this.createResources(data);
 
         return this.createTaskResult({ error, data, resources, playerId });

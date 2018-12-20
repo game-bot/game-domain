@@ -1,9 +1,9 @@
 const debug = require('debug')('gamebot');
 
-import { Player } from "./player";
-import { GameJobInfo } from "./game-job-info";
+import { Player } from "./player/player";
 import { GamebotError, GamebotErrorDetails } from "./errors";
 import { GameResourcesData } from "./game-resources";
+import { GameJobInfo } from "./entities/game-job-info";
 
 export type GameTaskResultStatus = 'done' | 'error' | 'waiting';
 

@@ -1,11 +1,11 @@
 // const debug = require('debug')('gamebot:smutstone:data');
 
-import { PlayerDataFetcher } from "../../../data/player-data-fetcher";
-import { Player } from "../../../player";
+import { Player } from "../../../player/player";
 import { SmutstoneApi } from "../api";
 import { UserData, UserDataParser } from "./user-data";
-import { IPlayerDataProvider } from "../../../data/player-data-provider";
+import { IPlayerDataProvider } from "../../../player/player-data-provider";
 import { AuthData } from "./auth-data";
+import { PlayerDataFetcher } from "../../../player/player-data-fetcher";
 
 export class UserDataFetcher extends PlayerDataFetcher<UserData, SmutstoneApi> {
     private parser: UserDataParser
@@ -26,6 +26,6 @@ export class UserDataFetcher extends PlayerDataFetcher<UserData, SmutstoneApi> {
         const jsonString = execResult[1].replace(/\\"/g, '\"')
         const jsonData = JSON.parse(jsonString);
 
-        return this.parser.parse(jsonData);
+        return this.parser.map(jsonData);
     }
 }

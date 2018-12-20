@@ -1,9 +1,9 @@
-import { PlayerData, PlayerDataHelpers, PlayerDataInfo } from "./player-data";
-import { Player } from "../player";
-import { unixTime } from "../utils";
+import { PlayerData, PlayerDataHelpers, PlayerDataInfo } from "../entities/player-data";
+import { Player } from "./player";
 import ms = require("ms");
-import { IPlayerDataRepository } from "./player-data-repository";
+import { IPlayerDataRepository } from "../repositories/player-data-repository";
 import { IPlayerDataFetcher } from "./player-data-fetcher";
+import { unixTime } from "@gamebot/domain";
 
 export interface IPlayerDataProvider<T> {
     get(player: Player): Promise<PlayerData<T>>
@@ -11,7 +11,7 @@ export interface IPlayerDataProvider<T> {
 
 export abstract class PlayerDataProvider<T> implements IPlayerDataProvider<T> {
     constructor(protected dataInfo: PlayerDataInfo,
-        protected rep: IPlayerDataRepository<T>,
+        protected rep: IPlayerDataRepository,
         protected fetcher: IPlayerDataFetcher<T>) {
 
     }
@@ -20,7 +20,7 @@ export abstract class PlayerDataProvider<T> implements IPlayerDataProvider<T> {
 
         const playerDataId = this.createPlayerDataId(player);
 
-        const existingData = await this.rep.get(playerDataId);
+        const existingData = await this.rep.get<T>(playerDataId);
 
         const timestamp = unixTime();
 

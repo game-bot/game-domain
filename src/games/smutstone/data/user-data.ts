@@ -1,5 +1,5 @@
-import { PlayerData, PlayerDataInfo } from "../../../data/player-data";
-import { DataParser } from "../../../data/data-parser";
+import { PlayerData, PlayerDataInfo } from "../../../entities/player-data";
+import { EntityMapper } from "../../../entities/entity-mapper";
 import * as Joi from 'joi';
 
 export const UserDataInfo: PlayerDataInfo = {
@@ -62,7 +62,7 @@ const UserDataPickFields = [
     'vars.__LBOX_T',
 ]
 
-export class UserDataParser extends DataParser<UserData> {
+export class UserDataParser extends EntityMapper<UserData> {
     constructor() {
         super(UserDataPickFields, userDataSchema)
     }

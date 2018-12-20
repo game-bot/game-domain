@@ -1,8 +1,8 @@
-import { Player } from "../player";
-import { Dictionary } from "../utils";
+import { Player } from "./player";
 import { GameApi } from "../game-api";
+import { IDictionary } from "@gamebot/domain";
 
-export interface IPlayerDataFetcher<DATA=Dictionary<string>, PD=void> {
+export interface IPlayerDataFetcher<DATA=IDictionary<string>, PD=void> {
     fetch(player: Player, playerData?: PD): Promise<DATA>
 }
 
