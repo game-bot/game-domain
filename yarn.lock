@@ -49,6 +49,13 @@
   dependencies:
     arrify "^1.0.1"
 
+"@gamebot/domain@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@gamebot/domain/-/domain-0.1.0.tgz#6a150170ddae8395fcd6a38dde63856897ba9039"
+  integrity sha512-3Ndfn5BwnMzi79bMi9fyP8ys/hUiUsMRKlDPS+nb1Oiba9zclXSlUV9+brohG55vM018l2S9q5t5ftMGa0E3yw==
+  dependencies:
+    joi "^14.3.0"
+
 "@ladjs/time-require@^0.1.4":
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/@ladjs/time-require/-/time-require-0.1.4.tgz#5c615d75fd647ddd5de9cf6922649558856b21a1"
