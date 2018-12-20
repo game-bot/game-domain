@@ -14,6 +14,7 @@ export type GameApiRequestParams = {
     method: 'GET' | 'POST'
     headers?: IDictionary<string>
     body?: any
+    timeout?: number
 }
 
 export type GameApiRootResponse = {
@@ -38,6 +39,7 @@ export abstract class GameApi<AD> {
         params = this.prepareRequestParams(url, params, authData);
         params = { ...params };
         params.headers = { ...this.defaultHeaders, ...params.headers };
+        params.timeout = params.timeout || 1000 * 5;
 
         const response = await got(url, params);
 

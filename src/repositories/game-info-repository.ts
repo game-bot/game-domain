@@ -31,4 +31,8 @@ export class GameInfoRepository {
 
         return items;
     }
+
+    all() {
+        return dataGames();
+    }
 }
