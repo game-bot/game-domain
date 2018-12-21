@@ -1,24 +1,22 @@
-import { PlayerData, PlayerDataHelpers, PlayerDataInfo } from "../entities/player-data";
+import { PlayerData, PlayerDataHelpers, PlayerDataIndentity } from "../entities/player-data";
 import { Player } from "./player";
 import ms = require("ms");
 import { IPlayerDataRepository } from "../repositories/player-data-repository";
-import { IPlayerDataFetcher } from "./player-data-fetcher";
 import { unixTime } from "@gamebot/domain";
+import { GameApi } from "../game-api";
 
-export interface IPlayerDataProvider<T> {
-    get(player: Player): Promise<PlayerData<T>>
+export interface IPlayerDataProvider {
+    get<T>(api: GameApi, player: Player, dataIdentity: PlayerDataIndentity): Promise<PlayerData<T>>
 }
 
-export abstract class PlayerDataProvider<T> implements IPlayerDataProvider<T> {
-    constructor(protected dataInfo: PlayerDataInfo,
-        protected rep: IPlayerDataRepository,
-        protected fetcher: IPlayerDataFetcher<T>) {
+export class PlayerDataProvider implements IPlayerDataProvider {
+    constructor(protected rep: IPlayerDataRepository) {
 
     }
 
-    async get(player: Player): Promise<PlayerData<T>> {
+    async get<T>(api: GameApi, player: Player, dataIdentity: PlayerDataIndentity): Promise<PlayerData<T>> {
 
-        const playerDataId = this.createPlayerDataId(player);
+        const playerDataId = this.createPlayerDataId(player, dataIdentity);
 
         const existingData = await this.rep.get<T>(playerDataId);
 
@@ -28,39 +26,39 @@ export abstract class PlayerDataProvider<T> implements IPlayerDataProvider<T> {
             return existingData;
         }
 
-        const data = await this.fetcher.fetch(player);
+        const data = await api.fetchPlayerData<T>(player, dataIdentity);
 
-        const newData = this.formatPlayerData(player, data);
+        const newData = this.formatPlayerData<T>(player, data, dataIdentity);
 
         await this.rep.put(newData);
 
         return newData;
     }
 
-    formatPlayerData(player: Player, data: T, ttl?: string) {
-        ttl = ttl || this.dataInfo.ttl;
+    formatPlayerData<T>(player: Player, data: T, dataIdentity: PlayerDataIndentity) {
+        const ttl = dataIdentity.ttl;
         const createdAt = unixTime();
         const expiresAt = createdAt + Math.floor(ms(ttl) / 1000);
-        const id = this.createPlayerDataId(player);
+        const id = this.createPlayerDataId(player, dataIdentity);
 
         const playerData: PlayerData<T> = {
             id,
-            identifier: this.dataInfo.identifier,
+            identifier: dataIdentity.identifier,
             playerId: player.id,
             gameId: player.gameId,
             createdAt,
             expiresAt,
-            version: this.dataInfo.version,
+            version: dataIdentity.version,
             data,
         }
 
         return playerData;
     }
 
-    createPlayerDataId(player: Player) {
+    createPlayerDataId(player: Player, dataIdentity: PlayerDataIndentity) {
         return PlayerDataHelpers.createId({
-            identifier: this.dataInfo.identifier,
-            version: this.dataInfo.version,
+            identifier: dataIdentity.identifier,
+            version: dataIdentity.version,
             playerId: player.id
         });
     }

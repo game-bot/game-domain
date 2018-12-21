@@ -2,10 +2,15 @@ import got = require("got");
 import { parse as parseCookie } from 'cookie';
 import { GamebotErrorDetails, GAMEBOT_ERROR_CODES, GamebotError } from "./errors";
 import { IDictionary } from "@gamebot/domain";
+import { Player } from "./player/player";
+import { PlayerDataIndentity } from "./entities/player-data";
+import { IPlayerDataProvider, PlayerDataProvider } from "./player/player-data-provider";
+import { IPlayerDataRepository } from "./repositories/player-data-repository";
+import { EntityMapper } from "./entities/entity-mapper";
 
 export type GameApiResponse<DATA=any> = {
     ok: boolean
-    data?: DATA,
+    data: DATA,
     headers?: IDictionary<string | string[] | undefined>
     statusCode?: number
 }
@@ -29,13 +34,34 @@ const DEFAULT_HEADERS: IDictionary<string> = {
     'Accept-Language': 'en,en-US;q=0.9,en;q=0.8,cs;q=0.7,es;q=0.6,hu;q=0.5,it;q=0.4,lt;q=0.3,ru;q=0.2,sk;q=0.1,uk;q=0.1,pl;q=0.1,bg;q=0.1,mo;q=0.1',
 }
 
-export abstract class GameApi<AD> {
+export abstract class GameApi<ENDPOINT extends string=string> {
     protected readonly defaultHeaders: IDictionary<string>
-    constructor(defaultHeaders?: IDictionary<string>) {
+    protected readonly dataProvider: IPlayerDataProvider
+
+    constructor(dataRepository: IPlayerDataRepository,
+        protected readonly authDataIdentity: PlayerDataIndentity,
+        protected readonly endpoints: Map<ENDPOINT, EntityMapper<any>>,
+        defaultHeaders?: IDictionary<string>) {
+
+        this.dataProvider = new PlayerDataProvider(dataRepository);
         this.defaultHeaders = { ...DEFAULT_HEADERS, ...defaultHeaders };
     }
 
-    async request(url: string, params: GameApiRequestParams, authData: AD): Promise<GameApiResponse> {
+    async endpoint<D=any>(endpoint: ENDPOINT, player: Player, url: string, params: GameApiRequestParams) {
+        const authData = await this.authenticate(player);
+        const response = await this.request(url, params, authData);
+        if (response.data) {
+            const mapper = this.endpoints.get(endpoint);
+            if (!mapper) {
+                throw new Error(`No entity mapper for endpoint: ${endpoint}`);
+            }
+            response.data = mapper.map(response.data);
+        }
+
+        return response as GameApiResponse<D>;
+    }
+
+    async request<AD=any>(url: string, params: GameApiRequestParams, authData: AD): Promise<GameApiResponse> {
         params = this.prepareRequestParams(url, params, authData);
         params = { ...params };
         params.headers = { ...this.defaultHeaders, ...params.headers };
@@ -50,7 +76,13 @@ export abstract class GameApi<AD> {
         })
     }
 
-    protected abstract prepareRequestParams(url: string, params: GameApiRequestParams, authData: AD): GameApiRequestParams
+    async authenticate<AD=any>(player: Player): Promise<AD> {
+        return (await this.dataProvider.get<AD>(this, player, this.authDataIdentity)).data;
+    }
+
+    abstract async fetchPlayerData<DATA=any>(player: Player, dataIdentity: PlayerDataIndentity): Promise<DATA>
+
+    protected abstract prepareRequestParams<AD=any>(url: string, params: GameApiRequestParams, authData: AD): GameApiRequestParams
 
     protected abstract formatApiResponse(apiResponse: GameApiRootResponse): GameApiResponse
 

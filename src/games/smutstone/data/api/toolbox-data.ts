@@ -1,11 +1,11 @@
 import * as Joi from 'joi';
 import { EntityMapper } from '../../../../entities/entity-mapper';
 
-export type ToolboxApiData = {
+export type LootboxOpenApiData = {
     rewards: any[]
 }
 
-export class ToolboxApiDataParser extends EntityMapper<ToolboxApiData> {
+export class LootboxOpenApiDataMapper extends EntityMapper<LootboxOpenApiData> {
     constructor() {
         super(['rewards'], schema)
     }

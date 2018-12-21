@@ -1,21 +1,17 @@
 import { IPlayerDataRepository } from "../../repositories/player-data-repository";
 import { IGameJob } from "../../game-job";
-import { AuthDataProvider } from "./data/auth-data-provider";
-import { UserDataProvider } from "./data/user-data-provider";
 import { SmutstoneApi } from "./api";
 import { GameJobInfo } from "../../entities/game-job-info";
 
 interface JobConstructor {
-    new(api: SmutstoneApi, authData: AuthDataProvider, userData: UserDataProvider): IGameJob;
+    new(api: SmutstoneApi): IGameJob;
 }
 
 export class SmutstoneJobBuilder {
-    private authProvider: AuthDataProvider
-    private userDataProvider: UserDataProvider
+    private api: SmutstoneApi
 
-    constructor(dataRepository: IPlayerDataRepository, private api: SmutstoneApi) {
-        this.authProvider = new AuthDataProvider(dataRepository, api);
-        this.userDataProvider = new UserDataProvider(dataRepository, api);
+    constructor(dataRepository: IPlayerDataRepository) {
+        this.api = new SmutstoneApi(dataRepository);
     }
 
     private getJobCreator(id: string) {
@@ -32,6 +28,6 @@ export class SmutstoneJobBuilder {
             throw new Error(`Invalid job id: ${jobInfo.id}`);
         }
 
-        return new create(this.api, this.authProvider, this.userDataProvider);
+        return new create(this.api);
     }
 }

@@ -1,7 +1,6 @@
 import { IPlayerDataRepository } from "./repositories/player-data-repository";
 import { SmutstoneJobBuilder } from "./games/smutstone/job-builder";
 import { IGameJob } from "./game-job";
-import { SmutstoneApi } from "./games/smutstone/api";
 import { GameJobInfo } from "./entities/game-job-info";
 
 
@@ -9,7 +8,7 @@ export class JobBuilder {
     private smutstoneBuilder: SmutstoneJobBuilder
 
     constructor(dataRepository: IPlayerDataRepository) {
-        this.smutstoneBuilder = new SmutstoneJobBuilder(dataRepository, new SmutstoneApi());
+        this.smutstoneBuilder = new SmutstoneJobBuilder(dataRepository);
     }
 
     build(jobInfo: GameJobInfo): IGameJob {

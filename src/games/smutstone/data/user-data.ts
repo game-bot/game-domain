@@ -1,8 +1,8 @@
-import { PlayerData, PlayerDataInfo } from "../../../entities/player-data";
+import { PlayerData, PlayerDataIndentity } from "../../../entities/player-data";
 import { EntityMapper } from "../../../entities/entity-mapper";
 import * as Joi from 'joi';
 
-export const UserDataInfo: PlayerDataInfo = {
+export const UserDataIdentity: PlayerDataIndentity = {
     identifier: 'user-data',
     version: 1,
     ttl: '1h',
@@ -62,7 +62,7 @@ const UserDataPickFields = [
     'vars.__LBOX_T',
 ]
 
-export class UserDataParser extends EntityMapper<UserData> {
+export class UserDataMapper extends EntityMapper<UserData> {
     constructor() {
         super(UserDataPickFields, userDataSchema)
     }

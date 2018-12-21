@@ -1,6 +1,6 @@
 import { md5 } from "@gamebot/domain";
 
-export type PlayerDataInfo = {
+export type PlayerDataIndentity = {
     readonly identifier: string
     readonly version: number
     readonly ttl: string

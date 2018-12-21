@@ -2,25 +2,22 @@
 
 import { SmutstoneJob } from "../smutstone-job";
 import { Player } from "../../../player/player";
-import { IPlayerDataProvider } from "../../../player/player-data-provider";
-import { AuthData } from "../data/auth-data";
 import { SmutstoneApi } from "../api";
 import { SmutstoneApiTask } from "../smutstone-task";
-import { UserData } from "../data/user-data";
 import { createGameResourcesFromRewards } from "../resources";
-import { ToolboxApiDataParser, ToolboxApiData } from "../data/api/toolbox-data";
+import { LootboxOpenApiData } from "../data/api/toolbox-data";
 import { GameJobInfo } from "../../../entities/game-job-info";
+import { ApiEndpoints } from "../data/endpoints";
 
 export default class OpenBronzeBoxJob extends SmutstoneJob {
     private task: OpenBronzeBoxTask
-    constructor(api: SmutstoneApi, authProvider: IPlayerDataProvider<AuthData>, private userDataProvider: IPlayerDataProvider<UserData>) {
-        super(__filename, authProvider, api);
+    constructor(api: SmutstoneApi) {
+        super(__filename, api);
         this.task = new OpenBronzeBoxTask(this.info, api);
     }
 
     protected async innerExecute(player: Player) {
-        const authData = (await this.authProvider.get(player)).data;
-        const userData = (await this.userDataProvider.get(player)).data;
+        const userData = await this.api.userData(player);
 
         const boxTime = userData.vars.__LBOX_T;
         const timeDiff = boxTime + 28800 - (userData.gameTime / 1000);
@@ -32,19 +29,19 @@ export default class OpenBronzeBoxJob extends SmutstoneJob {
             })
         }
 
-        return this.createJobResultFromTaskResult(await this.task.execute(player, authData));
+        return this.createJobResultFromTaskResult(await this.task.execute(player));
     }
 }
 
-class OpenBronzeBoxTask extends SmutstoneApiTask<ToolboxApiData> {
+class OpenBronzeBoxTask extends SmutstoneApiTask<LootboxOpenApiData> {
     constructor(jobInfo: GameJobInfo, api: SmutstoneApi) {
-        super(jobInfo, api, new ToolboxApiDataParser());
+        super(jobInfo, api, ApiEndpoints.lootbox_open);
     }
 
-    protected createApiData(_player: Player) {
-        return { "method": "lootbox.open", "args": { "typeId": 6000 } };
+    protected createApiEndpointArgs(_player: Player) {
+        return { "typeId": 6000 };
     }
-    protected createResources(data: ToolboxApiData) {
+    protected createResources(data: LootboxOpenApiData) {
         return createGameResourcesFromRewards(data.rewards).getData();
     }
 }

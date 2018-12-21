@@ -1,8 +1,8 @@
-import { PlayerData, PlayerDataInfo } from "../../../entities/player-data";
+import { PlayerData, PlayerDataIndentity } from "../../../entities/player-data";
 import { EntityMapper } from "../../../entities/entity-mapper";
 import * as Joi from 'joi';
 
-export const AuthDataInfo: PlayerDataInfo = {
+export const AuthDataIdentity: PlayerDataIndentity = {
     identifier: 'auth',
     version: 1,
     ttl: '15m',
@@ -16,7 +16,7 @@ export type AuthData = {
 
 export type AuthPlayerData = PlayerData<AuthData>
 
-export class AuthDataParser extends EntityMapper<AuthData> {
+export class AuthDataMapper extends EntityMapper<AuthData> {
     constructor() {
         super(['csrftoken', 'sessionid', 'cook'], schema)
     }

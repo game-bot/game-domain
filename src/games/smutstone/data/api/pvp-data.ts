@@ -2,7 +2,7 @@ import * as Joi from 'joi';
 import { EntityMapper } from '../../../../entities/entity-mapper';
 import { IDictionary } from '@gamebot/domain';
 
-export type PvpApiData = {
+export type PvpLoadApiData = {
     chests: PvpChestApiData[]
     points: number
     starChest: PvpStarChestApiData
@@ -12,7 +12,7 @@ export type PvpApiData = {
 export type PvpChestApiData = { added: number, rarity: number, id: number, league: number }
 export type PvpStarChestApiData = { stars: number, last: number, league: number }
 
-export class PvpApiDataParser extends EntityMapper<PvpApiData> {
+export class PvpLoadApiDataParser extends EntityMapper<PvpLoadApiData> {
     constructor() {
         super(['chests', 'points', 'starChest', 'slots'], pvpSchema.required())
     }
@@ -29,7 +29,7 @@ export class PvpClaimChestApiDataParser extends EntityMapper<PvpClaimChestApiDat
     }
 }
 
-export type PvpFightBattleApiData = {
+export type PvpBattleFightApiData = {
     chest?: PvpChestApiData
     result: {
         result: string
@@ -38,7 +38,7 @@ export type PvpFightBattleApiData = {
     pointsGain: number
 }
 
-export class PvpFightBattleApiDataParser extends EntityMapper<PvpFightBattleApiData> {
+export class PvpBattleFightApiDataMapper extends EntityMapper<PvpBattleFightApiData> {
     constructor() {
         super(['chest', 'result', 'starChest', 'pointsGain'], fightBattleSchema.required())
     }

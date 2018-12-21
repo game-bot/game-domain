@@ -2,7 +2,6 @@ const debug = require('debug')('gamebot');
 
 import { Player } from "./player/player";
 import { GameTaskResultStatus, GameTaskResult } from "./game-task";
-import { IPlayerDataProvider } from "./player/player-data-provider";
 import { GamebotError, GamebotErrorDetails } from "./errors";
 import { GameResourcesData, GameResources } from "./game-resources";
 import { dataGameJobByFile } from "./data";
@@ -24,9 +23,9 @@ export interface IGameJob {
     execute(player: Player): Promise<GameJobResult>
 }
 
-export abstract class GameJob<AD> implements IGameJob {
+export abstract class GameJob implements IGameJob {
     protected info: GameJobInfo
-    constructor(jobFile: string, protected authProvider: IPlayerDataProvider<AD>) {
+    constructor(jobFile: string) {
         const info = dataGameJobByFile(jobFile);
         if (!info) {
             throw new Error(`Invalid job file path: ${jobFile}`);

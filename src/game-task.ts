@@ -7,30 +7,30 @@ import { GameJobInfo } from "./entities/game-job-info";
 
 export type GameTaskResultStatus = 'done' | 'error' | 'waiting';
 
-export type GameTaskResult<D=any> = {
+export type GameTaskResult<RD=any> = {
     gameId: string
     playerId: string
     taskId: string
     status: GameTaskResultStatus
     error?: GamebotError
-    data?: D
+    data?: RD
     resources?: GameResourcesData
     startAt?: string
     endAt?: string
 }
 
-export interface IGameTask<AD> {
-    execute(player: Player, authData: AD, data?: any): Promise<GameTaskResult>
+export interface IGameTask {
+    execute(player: Player, data?: any): Promise<GameTaskResult>
 }
 
-export abstract class GameTask<AD, RD=any> implements IGameTask<AD> {
+export abstract class GameTask<RD=any> implements IGameTask {
     constructor(protected info: GameJobInfo) { }
 
-    async execute(player: Player, authData: AD, data?: any): Promise<GameTaskResult<RD>> {
+    async execute(player: Player, data?: any): Promise<GameTaskResult<RD>> {
         const taskName = this.constructor.name;
         debug(`Start task: ${taskName}`);
         const startAt = new Date().toISOString();
-        const result = await this.innerExecute(player, authData, data);
+        const result = await this.innerExecute(player, data);
         const endAt = new Date().toISOString();
         result.startAt = startAt;
         result.endAt = endAt;
@@ -39,7 +39,7 @@ export abstract class GameTask<AD, RD=any> implements IGameTask<AD> {
         return result;
     }
 
-    protected abstract innerExecute(player: Player, authData: AD, data?: any): Promise<GameTaskResult<RD>>
+    protected abstract innerExecute(player: Player, data?: any): Promise<GameTaskResult<RD>>
 
     getTaskId() {
         return this.constructor.name;
