@@ -2,36 +2,59 @@
 // const debug = require('debug')('gamebot:smutstone:api');
 
 import { IDictionary } from "@gamebot/domain";
-import { Player } from "../../player/player";
-import { IPlayerDataRepository } from "../../repositories/player-data-repository";
+import { Player } from "../../entities/player";
 import { BaseSmutstoneApi } from "./base-api";
 import { PvpBattleFightApiDataMapper, PvpLoadApiDataParser, PvpClaimChestApiDataParser, PvpBattleFightApiData, PvpClaimChestApiData, PvpLoadApiData } from "./data/api/pvp-data";
-import { ApiEndpoints } from "./data/endpoints";
-import { EntityMapper } from "../../entities/entity-mapper";
+import { ApiEndpoints, ApiEndpointInfo } from "./data/endpoints";
 import { CardsFightApiDataParser, CardsFightApiData } from "./data/api/cards-fight-data";
 import { LootboxOpenApiDataMapper, LootboxOpenApiData } from "./data/api/toolbox-data";
-import { EmptyEntityMapper } from "../../entities/empty-object";
+import ms = require("ms");
+import { IApiClientRepository } from "../../repositories/api-client-repository";
+import { AuthDataMapper } from "./data/auth-data";
+import { UserDataMapper } from "./data/user-data";
 
-export type ApiResponse = {
-    ok: boolean
-    data?: any,
-    headers: IDictionary<string | string[] | undefined>
-    statusCode?: number
-}
+
+
 
 export class SmutstoneApi extends BaseSmutstoneApi {
 
-    constructor(dataRepository: IPlayerDataRepository, version: number = 28, defaultHeaders?: IDictionary<string>) {
-        const endpoints = new Map<ApiEndpoints, EntityMapper<any>>();
-        endpoints.set(ApiEndpoints.cards_battle_fight, new CardsFightApiDataParser());
-        endpoints.set(ApiEndpoints.lootbox_open, new LootboxOpenApiDataMapper());
-        endpoints.set(ApiEndpoints.pvp_battle_fight, new PvpBattleFightApiDataMapper());
-        endpoints.set(ApiEndpoints.pvp_battle_start, new EmptyEntityMapper());
-        endpoints.set(ApiEndpoints.pvp_chest_claim, new PvpClaimChestApiDataParser());
-        endpoints.set(ApiEndpoints.pvp_load, new PvpLoadApiDataParser());
-        endpoints.set(ApiEndpoints.pvp_starchest_claim, new PvpClaimChestApiDataParser());
+    constructor(repository: IApiClientRepository, version: number = 28, defaultHeaders?: IDictionary<string>) {
+        const endpoints = new Map<ApiEndpoints, ApiEndpointInfo>();
+        endpoints.set(ApiEndpoints.cards_battle_fight, {
+            mapper: new CardsFightApiDataParser(),
+            // ttl: ms('30m'),
+        });
+        endpoints.set(ApiEndpoints.lootbox_open, {
+            mapper: new LootboxOpenApiDataMapper(),
+            // ttl: ms('1h'),
+        });
+        endpoints.set(ApiEndpoints.pvp_battle_fight, {
+            mapper: new PvpBattleFightApiDataMapper(),
+            // ttl: ms('30m'),
+        });
+        // endpoints.set(ApiEndpoints.pvp_battle_start, new EmptyEntityMapper());
+        endpoints.set(ApiEndpoints.pvp_chest_claim, {
+            mapper: new PvpClaimChestApiDataParser(),
+            // ttl: ms('30m'),
+        });
+        endpoints.set(ApiEndpoints.pvp_load, {
+            mapper: new PvpLoadApiDataParser(),
+            ttl: ms('1h'),
+        });
+        endpoints.set(ApiEndpoints.pvp_starchest_claim, {
+            mapper: new PvpClaimChestApiDataParser(),
+            // ttl: ms('30m'),
+        });
+        endpoints.set(ApiEndpoints.authenticate, {
+            mapper: new AuthDataMapper(),
+            ttl: ms('30m'),
+        });
+        endpoints.set(ApiEndpoints.user_data, {
+            mapper: new UserDataMapper(),
+            ttl: ms('30m'),
+        });
 
-        super(dataRepository, endpoints, version, defaultHeaders);
+        super(repository, endpoints, version, defaultHeaders);
     }
 
     async methodPvpBattleFight(player: Player, args: { deck: number }) {

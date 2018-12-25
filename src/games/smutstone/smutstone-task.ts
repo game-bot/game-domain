@@ -1,6 +1,6 @@
 import { GameTask } from "../../game-task";
 import { SmutstoneApi } from "./api";
-import { Player } from "../../player/player";
+import { Player } from "../../entities/player";
 import { GameResourcesData } from "../../game-resources";
 import { GameJobInfo } from "../../entities/game-job-info";
 import { ApiEndpoints } from "./data/endpoints";

@@ -1,7 +1,7 @@
 // const debug = require('debug')('gamebot:smutstone:job');
 
 import { SmutstoneJob } from "../smutstone-job";
-import { Player } from "../../../player/player";
+import { Player } from "../../../entities/player";
 import { SmutstoneApi } from "../api";
 import { SmutstoneApiTask } from "../smutstone-task";
 import { createGameResourcesFromRewards } from "../resources";
@@ -20,7 +20,7 @@ export default class CardsBattleFightJob extends SmutstoneJob {
     protected async innerExecute(player: Player) {
         const userData = (await this.api.userData(player));
 
-        if (userData.resources.energy < 50) {
+        if (userData.resources.energy < 20) {
             return this.createJobResult({
                 playerId: player.id,
                 status: 'waiting',
@@ -33,7 +33,13 @@ export default class CardsBattleFightJob extends SmutstoneJob {
         const mission = location.missions[missionIndex];
         const args = { "location": location.id, "mission": mission.id, "deck": 1 };
 
-        return this.createJobResultFromTaskResult(await this.task.execute(player, args));
+        const fightResults = await this.task.execute(player, args);
+
+        if (fightResults.status === 'done') {
+            userData.resources.energy -= 15;
+        }
+
+        return this.createJobResultFromTaskResult(fightResults);
     }
 }
 

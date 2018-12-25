@@ -2,7 +2,7 @@
 const debug = require('debug')('gamebot:smutstone:job');
 
 import { SmutstoneJob } from "../smutstone-job";
-import { Player } from "../../../player/player";
+import { Player } from "../../../entities/player";
 import { SmutstoneApi } from "../api";
 import { SmutstoneTask, SmutstoneApiTask } from "../smutstone-task";
 import { GameTaskResult } from "../../../game-task";
@@ -31,7 +31,9 @@ export default class ManageDuelsJob extends SmutstoneJob {
 
     protected async innerExecute(player: Player) {
         const playerId = player.id;
+        // console.time('user-data');
         const userData = await this.api.userData(player);
+        // console.timeEnd('user-data');
         const duelsDataResponse = await this.api.methodPvpLoad(player);
         const errorDetails = this.createErrorDetails();
         let error = this.api.createError(duelsDataResponse, errorDetails);
@@ -98,7 +100,7 @@ export default class ManageDuelsJob extends SmutstoneJob {
                 if (result.data.chest) {
                     duelsData.chests.push(result.data.chest);
                 }
-                await delay(1000 * 2)
+                // await delay(1000 * 2)
                 await this.fillChests(player, duelsData, results, inc + 1);
             }
         } else {
@@ -152,7 +154,6 @@ class PvpBattleFightTask extends SmutstoneTask<PvpBattleFightApiData> {
     }
 
     async innerExecute(player: Player) {
-
         const playerId = player.id;
         const startResponse = await this.api.methodPvpBattleStart(player);
         const errorDetails = this.createErrorDetails();
@@ -162,7 +163,7 @@ class PvpBattleFightTask extends SmutstoneTask<PvpBattleFightApiData> {
             return this.createTaskResult({ error, playerId })
         }
 
-        await delay(1000);
+        // await delay(1000);
         const response = await this.api.methodPvpBattleFight(player, { "deck": 1 });
         error = this.api.createError(response, errorDetails);
 

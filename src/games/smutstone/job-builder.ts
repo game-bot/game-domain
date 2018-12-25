@@ -1,7 +1,7 @@
-import { IPlayerDataRepository } from "../../repositories/player-data-repository";
 import { IGameJob } from "../../game-job";
 import { SmutstoneApi } from "./api";
 import { GameJobInfo } from "../../entities/game-job-info";
+import { IApiClientRepository } from "../../repositories/api-client-repository";
 
 interface JobConstructor {
     new(api: SmutstoneApi): IGameJob;
@@ -10,8 +10,8 @@ interface JobConstructor {
 export class SmutstoneJobBuilder {
     private api: SmutstoneApi
 
-    constructor(dataRepository: IPlayerDataRepository) {
-        this.api = new SmutstoneApi(dataRepository);
+    constructor(repository: IApiClientRepository) {
+        this.api = new SmutstoneApi(repository);
     }
 
     private getJobCreator(id: string) {

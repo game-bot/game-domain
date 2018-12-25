@@ -1,16 +1,16 @@
 
-// const debug = require('debug')('gamebot:smutstone:api');
+const debug = require('debug')('gamebot:smutstone:api');
 
-import { AuthData, AuthDataMapper, AuthDataIdentity } from "./data/auth-data";
+import { AuthData } from "./data/auth-data";
 import * as FormData from 'form-data';
-import { GameApi, GameApiRootResponse, GameApiRequestParams, GameApiResponse, serializeCookies, parseSetCookie } from "../../game-api";
 import { IDictionary } from "@gamebot/domain";
-import { PlayerDataIndentity } from "../../entities/player-data";
-import { Player } from "../../player/player";
-import { UserDataIdentity, UserDataMapper, UserData } from "./data/user-data";
-import { IPlayerDataRepository } from "../../repositories/player-data-repository";
-import { EntityMapper } from "../../entities/entity-mapper";
-import { ApiEndpoints } from "./data/endpoints";
+import { Player } from "../../entities/player";
+import { UserData } from "./data/user-data";
+import { ApiEndpoints, ApiEndpointInfo } from "./data/endpoints";
+import { IApiClientRepository } from "../../repositories/api-client-repository";
+import { ApiCient, ApiEndpointCacheInfo } from "../../api/api-client";
+import { GameApiRequestParams, GameApiResponse, GameApiRootResponse } from "../../api/base-api-client";
+import { parseSetCookie, serializeCookies } from "../../utils";
 
 export type ApiResponse = {
     ok: boolean
@@ -19,64 +19,24 @@ export type ApiResponse = {
     statusCode?: number
 }
 
-export class BaseSmutstoneApi extends GameApi<ApiEndpoints> {
-    private authDataMapper: AuthDataMapper
-    private userDataMapper: UserDataMapper
 
-    constructor(dataRepository: IPlayerDataRepository,
-        endpoints: Map<ApiEndpoints, EntityMapper<any>>,
+
+export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
+
+    constructor(repository: IApiClientRepository,
+        private _endpoints: Map<ApiEndpoints, ApiEndpointInfo>,
         private version: number = 28, defaultHeaders?: IDictionary<string>) {
-        super(dataRepository, AuthDataIdentity, endpoints, defaultHeaders);
-        this.authDataMapper = new AuthDataMapper();
-        this.userDataMapper = new UserDataMapper();
+        super(repository, defaultHeaders);
     }
 
-    gamePage(authData: Partial<AuthData>) {
-        return this.request('https://smutstone.com/', { method: 'GET' }, authData as AuthData);
+    async authenticate<AD=AuthData>(player: Player) {
+        const response = await this.endpoint<AD>(ApiEndpoints.authenticate, player, 'https://smutstone.com/', { method: 'GET' }, { cook: player.identity });
+        return response.data;
     }
 
     async userData(player: Player) {
-        return (await this.dataProvider.get<UserData>(this, player, UserDataIdentity)).data;
-    }
-
-    async fetchPlayerData<DATA>(player: Player, dataIdentity: PlayerDataIndentity) {
-
-        if (dataIdentity.identifier === AuthDataIdentity.identifier) {
-            return (await this.fetchAuthData(player)) as any as DATA;
-        }
-        if (dataIdentity.identifier === UserDataIdentity.identifier) {
-            return (await this.fetchUserData(player)) as any as DATA;
-        }
-
-        throw new Error(`Invalid player data identifier: ${dataIdentity.identifier}`);
-    }
-
-    protected async fetchUserData(player: Player) {
-        const response = await this.gamePage({ cook: player.identity });
-
-        const execResult = /userData = JSON.parse\('([^']+)'\);/i.exec(response.data);
-        if (!execResult) {
-            throw new Error(`Not fount userData in html`);
-        }
-        const jsonString = execResult[1].replace(/\\"/g, '\"')
-        const jsonData = JSON.parse(jsonString);
-
-        return this.userDataMapper.map(jsonData);
-    }
-
-    protected async fetchAuthData(player: Player) {
-        if (!player.identity) {
-            throw new Error(`Player identity data is invalid!`);
-        }
-
-        const response = await this.gamePage({ cook: player.identity });
-
-        const cookies = parseSetCookie(response.headers && response.headers["set-cookie"] as string[] || []);
-
-        const data: AuthData = this.authDataMapper.map(cookies);
-        data.cook = player.identity;
-
-        return data;
+        const response = await this.endpoint<UserData>(ApiEndpoints.user_data, player, 'https://smutstone.com/', { method: 'GET' });
+        return response.data;
     }
 
     async endpointCall<DATA>(endpoint: ApiEndpoints, player: Player, args: any) {
@@ -90,9 +50,44 @@ export class BaseSmutstoneApi extends GameApi<ApiEndpoints> {
         return this.endpoint<DATA>(endpoint, player, 'https://smutstone.com/api/', params);
     }
 
-    protected prepareRequestParams(_url: string, params: GameApiRequestParams, authData: any): GameApiRequestParams {
+    protected mapEndpointData<DATA>(endpoint: ApiEndpoints, response: GameApiResponse, player: Player): DATA {
+        const item = this._endpoints.get(endpoint);
+
+        if (item) {
+            debug(`got endpoint data: ${endpoint}-${item.ttl}`);
+            let data = response.data;
+            if (endpoint === ApiEndpoints.authenticate) {
+                const cookie = response.headers && response.headers["set-cookie"] as string[] || [];
+                cookie.push(`cook=${player.identity}`);
+                data = parseSetCookie(cookie);
+            } else if (endpoint === ApiEndpoints.user_data) {
+                const execResult = /userData = JSON.parse\('([^']+)'\);/i.exec(data);
+                if (!execResult) {
+                    throw new Error(`Not fount userData in html`);
+                }
+                const jsonString = execResult[1].replace(/\\"/g, '\"')
+                data = JSON.parse(jsonString);
+            }
+            return item.mapper.map(data) as DATA;
+        }
+        return response.data;
+    }
+
+    protected getEndpointCacheInfo(endpoint: ApiEndpoints, player: Player, url: string) {
+        const item = this._endpoints.get(endpoint);
+        if (!item) {
+            debug(`NO endpoint cahe info: ${endpoint}`);
+            return null;
+        }
+        return {
+            key: `${endpoint}_${player.id}_${url}`,
+            ttl: item.ttl,
+        } as ApiEndpointCacheInfo;
+    }
+
+    protected formatHttpRequestParams(_url: string, params: GameApiRequestParams, authData: any): GameApiRequestParams {
         params.headers = params.headers || {};
-        params.headers.Cookie = serializeCookies(authData);
+        params.headers.Cookie = serializeCookies(authData || {});
 
         if (params.body) {
 

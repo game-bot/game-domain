@@ -1,7 +1,7 @@
 // const debug = require('debug')('gamebot:smutstone:job');
 
 import { SmutstoneJob } from "../smutstone-job";
-import { Player } from "../../../player/player";
+import { Player } from "../../../entities/player";
 import { SmutstoneApi } from "../api";
 import { SmutstoneApiTask } from "../smutstone-task";
 import { createGameResourcesFromRewards } from "../resources";

@@ -7,10 +7,11 @@ export enum GAMEBOT_ERROR_CODES {
 }
 
 export type GamebotErrorDetails = {
-    gameId: string
+    gameId?: string
     jobId?: string
     taskId?: string
     data?: any
+    params?: any
 }
 
 export class GamebotError extends Error {

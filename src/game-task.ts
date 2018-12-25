@@ -1,6 +1,6 @@
 const debug = require('debug')('gamebot');
 
-import { Player } from "./player/player";
+import { Player } from "./entities/player";
 import { GamebotError, GamebotErrorDetails } from "./errors";
 import { GameResourcesData } from "./game-resources";
 import { GameJobInfo } from "./entities/game-job-info";

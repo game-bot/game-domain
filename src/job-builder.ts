@@ -1,14 +1,14 @@
-import { IPlayerDataRepository } from "./repositories/player-data-repository";
 import { SmutstoneJobBuilder } from "./games/smutstone/job-builder";
 import { IGameJob } from "./game-job";
 import { GameJobInfo } from "./entities/game-job-info";
+import { IApiClientRepository } from "./repositories/api-client-repository";
 
 
 export class JobBuilder {
     private smutstoneBuilder: SmutstoneJobBuilder
 
-    constructor(dataRepository: IPlayerDataRepository) {
-        this.smutstoneBuilder = new SmutstoneJobBuilder(dataRepository);
+    constructor(repository: IApiClientRepository) {
+        this.smutstoneBuilder = new SmutstoneJobBuilder(repository);
     }
 
     build(jobInfo: GameJobInfo): IGameJob {
