@@ -29,6 +29,18 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
         super(repository, defaultHeaders);
     }
 
+    async endpoint<DATA>(endpoint: ApiEndpoints, player: Player, url: string, params: GameApiRequestParams, authData?: any) {
+        const response = await super.endpoint<DATA>(endpoint, player, url, params, authData);
+        if (response.data) {
+            if (/new version available/.test((<any>response.data).error || '')) {
+                debug(`Increment api version: ${this.version}`);
+                this.version++;
+            }
+        }
+
+        return response;
+    }
+
     async authenticate<AD=AuthData>(player: Player) {
         const response = await this.endpoint<AD>(ApiEndpoints.authenticate, player, 'https://smutstone.com/', { method: 'GET' }, { cook: player.identity });
         return response.data;
@@ -124,9 +136,6 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
     parseErrorMessage(response: GameApiResponse): string | undefined {
         const data = response.data;//typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
         if (data && typeof data.error === 'string') {
-            if (/new version available/.test(data.error)) {
-                this.version++;
-            }
             return data.error;
         }
     }
