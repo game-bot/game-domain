@@ -5,4 +5,7 @@ export interface GameJobInfo {
     readonly frequency: string
     readonly gameId: string
     readonly createdAt: string
+    readonly defaultStatus: GameJobInfoStatus
 }
+
+export type GameJobInfoStatus = 'active' | 'inactive';

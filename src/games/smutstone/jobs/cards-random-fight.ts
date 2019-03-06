@@ -20,7 +20,7 @@ export default class CardsBattleFightJob extends SmutstoneJob {
     protected async innerExecute(player: Player) {
         const userData = (await this.api.userData(player));
 
-        if (userData.resources.energy < 20) {
+        if (userData.resources.energy < 50) {
             return this.createJobResult({
                 playerId: player.id,
                 status: 'waiting',
@@ -36,7 +36,7 @@ export default class CardsBattleFightJob extends SmutstoneJob {
         const fightResults = await this.task.execute(player, args);
 
         if (fightResults.status === 'done') {
-            userData.resources.energy -= 15;
+            userData.resources.energy -= 17;
         }
 
         return this.createJobResultFromTaskResult(fightResults);

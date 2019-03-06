@@ -68,6 +68,14 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 10
+            },
+            "defaultStatus": {
+              "description": "Default job status",
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive"
+              ]
             }
           },
           "required": [
@@ -76,7 +84,8 @@
             "description",
             "frequency",
             "weight",
-            "createdAt"
+            "createdAt",
+            "defaultStatus"
           ]
         }
       }

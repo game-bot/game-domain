@@ -13,6 +13,7 @@
         "description": "Fight a random place",
         "frequency": "30m",
         "weight": 0,
+        "defaultStatus": "active",
         "createdAt": "2018-12-20T12:22:29.176Z"
       },
       {
@@ -21,6 +22,7 @@
         "description": "Fight and open chests",
         "frequency": "30m",
         "weight": 0,
+        "defaultStatus": "active",
         "createdAt": "2018-12-20T12:22:29.176Z"
       },
       {
@@ -29,6 +31,7 @@
         "description": "Open free bronse box",
         "frequency": "8h",
         "weight": 0,
+        "defaultStatus": "active",
         "createdAt": "2018-12-20T12:22:29.176Z"
       }
     ]
