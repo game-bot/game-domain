@@ -12,7 +12,7 @@ export class SmutstonePlayerIdentityValidator {
     async validate(player: PlayerIdentity): Promise<boolean> {
         const data = await this.api.userData({ id: '', ...player });
 
-        if (!data || !data.story || !data.story.locations || data.story.locations.length) {
+        if (!data || !data.story || !data.story.locations || !data.story.locations.length) {
             return false;
         }
 

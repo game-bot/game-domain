@@ -11,6 +11,7 @@ import { IApiClientRepository } from "../../repositories/api-client-repository";
 import { ApiCient, ApiEndpointCacheInfo } from "../../api/api-client";
 import { GameApiRequestParams, GameApiResponse, GameApiRootResponse } from "../../api/base-api-client";
 import { parseSetCookie, serializeCookies } from "../../utils";
+import { GamebotApi500Error, GamebotError } from "../../errors";
 
 export type ApiResponse = {
     ok: boolean
@@ -43,6 +44,13 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
 
     async authenticate<AD=AuthData>(player: Player) {
         const response = await this.endpoint<AD>(ApiEndpoints.authenticate, player, 'https://smutstone.com/', { method: 'GET' }, { cook: player.identity });
+        if (typeof response.data !== 'object') {
+            if (response.error) {
+                throw response.error;
+            }
+            throw new GamebotApi500Error(`Cannot get auth data`, {});
+        }
+
         return response.data;
     }
 
@@ -81,6 +89,7 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
                 const jsonString = execResult[1].replace(/\\"/g, '\"')
                 data = JSON.parse(jsonString);
             }
+
             return item.mapper.map(data) as DATA;
         }
         return response.data;
@@ -101,7 +110,7 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
     protected formatHttpRequestParams(_url: string, params: GameApiRequestParams, authData: any): GameApiRequestParams {
         params.headers = params.headers || {};
         params.headers.Cookie = serializeCookies(authData || {});
-        debug(`set cookie`, authData);
+        // debug(`set cookie`, authData);
 
         if (params.body) {
 
@@ -120,11 +129,13 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
     protected formatApiResponse(apiResponse: GameApiRootResponse): GameApiResponse {
         let ok = true;
         let body: any;
+        let error: GamebotError | undefined = undefined
         try {
             body = apiResponse.body && JSON.parse(apiResponse.body);
             ok = body && body.result === 'ok';
         } catch (e) {
             ok = false;
+            // error = new GamebotApiDataError(e.message || 'Cannot parse api response', {});
         }
 
         return {
@@ -132,6 +143,7 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
             data: body && body.response || body || apiResponse.body,
             headers: apiResponse.headers,
             statusCode: apiResponse.statusCode,
+            error: error,
         }
     }
 

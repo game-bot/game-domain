@@ -11,7 +11,7 @@ export class PlayerIdentityValidator {
         this.smutstone = new SmutstonePlayerIdentityValidator();
     }
 
-    validate(player: PlayerIdentity): Promise<boolean> {
+    async validate(player: PlayerIdentity): Promise<boolean> {
         switch (player.gameId) {
             case 'smutstone': return this.smutstone.validate(player);
         }
