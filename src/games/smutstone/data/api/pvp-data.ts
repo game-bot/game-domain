@@ -20,7 +20,7 @@ export class PvpLoadApiDataParser extends EntityMapper<PvpLoadApiData> {
 
 export type PvpClaimChestApiData = {
     unlocked: boolean
-    reward: IDictionary<any>
+    reward?: IDictionary<any>
 }
 
 export class PvpClaimChestApiDataParser extends EntityMapper<PvpClaimChestApiData> {
@@ -68,7 +68,7 @@ const fightBattleSchema = Joi.object().keys({
 
 const claimChestSchema = Joi.object().keys({
     unlocked: Joi.bool(),
-    reward: Joi.object().required(),
+    reward: Joi.object(),
 });
 
 const pvpSchema = Joi.object().keys({

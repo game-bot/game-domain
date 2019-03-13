@@ -25,7 +25,7 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
 
     constructor(repository: IApiClientRepository,
         private _endpoints: Map<ApiEndpoints, ApiEndpointInfo>,
-        private version: number = 28, defaultHeaders?: IDictionary<string>) {
+        private version: number = 44, defaultHeaders?: IDictionary<string>) {
         super(repository, defaultHeaders);
     }
 
