@@ -71,6 +71,7 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
             if (endpoint === ApiEndpoints.authenticate) {
                 const cookie = response.headers && response.headers["set-cookie"] as string[] || [];
                 cookie.push(`cook=${player.identity}`);
+                debug('cookies', cookie);
                 data = parseSetCookie(cookie);
             } else if (endpoint === ApiEndpoints.user_data) {
                 const execResult = /userData = JSON.parse\('([^']+)'\);/i.exec(data);
@@ -100,6 +101,7 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
     protected formatHttpRequestParams(_url: string, params: GameApiRequestParams, authData: any): GameApiRequestParams {
         params.headers = params.headers || {};
         params.headers.Cookie = serializeCookies(authData || {});
+        debug(`set cookie`, authData);
 
         if (params.body) {
 

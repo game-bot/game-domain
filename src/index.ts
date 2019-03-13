@@ -11,5 +11,6 @@ export {
     IApiClientRepository,
     MemoryApiClientRepository,
     MemoryApiClientRepositoryOptions,
+    NoCacheApiClientRepository,
 } from './repositories/api-client-repository';
-export { PlayerValidator } from './player-validator';
+export { PlayerIdentityValidator } from './player-identity-validator';

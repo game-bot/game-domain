@@ -30,3 +30,12 @@ export class MemoryApiClientRepository implements IApiClientRepository {
         this.cache.set(key, data, ttl);
     }
 }
+
+export class NoCacheApiClientRepository implements IApiClientRepository {
+    async get<T>(_key: string): Promise<T | null> {
+        return null;
+    }
+    async put<T>(_key: string, _data: T): Promise<void> {
+
+    }
+}

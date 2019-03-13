@@ -4,3 +4,9 @@ export type Player = {
     gameId: string
     identity: string
 }
+
+export type PlayerIdentity = {
+    gameId: string
+    identity: string
+}
+
