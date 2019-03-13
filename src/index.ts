@@ -12,3 +12,4 @@ export {
     MemoryApiClientRepository,
     MemoryApiClientRepositoryOptions,
 } from './repositories/api-client-repository';
+export { PlayerValidator } from './player-validator';
