@@ -6,6 +6,7 @@ export interface GameJobInfo {
     readonly gameId: string
     readonly createdAt: string
     readonly defaultStatus: GameJobInfoStatus
+    readonly status: GameJobInfoStatus
 }
 
 export type GameJobInfoStatus = 'active' | 'inactive';

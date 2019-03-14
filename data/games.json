@@ -14,6 +14,7 @@
         "frequency": "30m",
         "weight": 0,
         "defaultStatus": "active",
+        "status": "active",
         "createdAt": "2018-12-20T12:22:29.176Z"
       },
       {
@@ -23,6 +24,7 @@
         "frequency": "30m",
         "weight": 0,
         "defaultStatus": "active",
+        "status": "active",
         "createdAt": "2018-12-20T12:22:29.176Z"
       },
       {
@@ -32,6 +34,7 @@
         "frequency": "8h",
         "weight": 0,
         "defaultStatus": "active",
+        "status": "active",
         "createdAt": "2018-12-20T12:22:29.176Z"
       }
     ]
