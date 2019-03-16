@@ -12,13 +12,14 @@ import ms = require("ms");
 import { IApiClientRepository } from "../../repositories/api-client-repository";
 import { AuthDataMapper } from "./data/auth-data";
 import { UserDataMapper } from "./data/user-data";
+import { API_VERSION } from "./config";
 
 
 
 
 export class SmutstoneApi extends BaseSmutstoneApi {
 
-    constructor(repository: IApiClientRepository, version: number = 28, defaultHeaders?: IDictionary<string>) {
+    constructor(repository: IApiClientRepository, version: number = API_VERSION, defaultHeaders?: IDictionary<string>) {
         const endpoints = new Map<ApiEndpoints, ApiEndpointInfo>();
         endpoints.set(ApiEndpoints.cards_battle_fight, {
             mapper: new CardsFightApiDataParser(),

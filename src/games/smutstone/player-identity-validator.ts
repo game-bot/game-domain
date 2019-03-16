@@ -1,12 +1,13 @@
 import { SmutstoneApi } from "./api";
 import { NoCacheApiClientRepository } from "../../repositories/api-client-repository";
 import { PlayerIdentity } from "../../entities/player";
+import { API_VERSION } from "./config";
 
 export class SmutstonePlayerIdentityValidator {
     private api: SmutstoneApi
 
     constructor() {
-        this.api = new SmutstoneApi(new NoCacheApiClientRepository());
+        this.api = new SmutstoneApi(new NoCacheApiClientRepository(), API_VERSION);
     }
 
     async validate(player: PlayerIdentity): Promise<boolean> {

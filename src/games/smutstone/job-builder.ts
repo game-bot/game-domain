@@ -2,6 +2,7 @@ import { IGameJob } from "../../game-job";
 import { SmutstoneApi } from "./api";
 import { GameJobInfo } from "../../entities/game-job-info";
 import { IApiClientRepository } from "../../repositories/api-client-repository";
+import { API_VERSION } from "./config";
 
 interface JobConstructor {
     new(api: SmutstoneApi): IGameJob;
@@ -11,7 +12,7 @@ export class SmutstoneJobBuilder {
     private api: SmutstoneApi
 
     constructor(repository: IApiClientRepository) {
-        this.api = new SmutstoneApi(repository);
+        this.api = new SmutstoneApi(repository, API_VERSION);
     }
 
     private getJobCreator(id: string) {
