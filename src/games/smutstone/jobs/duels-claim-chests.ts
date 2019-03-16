@@ -54,7 +54,8 @@ export default class DuelsClaimChestsJob extends SmutstoneJob {
         const results: GameTaskResult<PvpClaimChestApiData>[] = []
         if (duelsData.starChest.stars > 2) {
             results.push(await this.claimStartchest.execute(player));
-            await delay(1000 * .5)
+            duelsData.starChest.stars = 0;
+            await delay(1000 * .5);
         }
 
         const claimedChests: PvpChestApiData[] = []
