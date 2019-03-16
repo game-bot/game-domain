@@ -1,22 +1,12 @@
 [
   {
     "id": "smutstone",
-    "name": "Smutstone",
-    "description": "Browser based adult game",
+    "name": "SmutStone",
+    "description": "Enjoy the best of two worlds: an immersive fun card game and juicy fantasy erotica.",
     "url": "https://smutstone.com",
     "status": "active",
     "createdAt": "2018-12-20T12:22:29.176Z",
     "jobs": [
-      {
-        "id": "manage-duels",
-        "name": "Manage Duels",
-        "description": "Fight and open chests",
-        "frequency": "30m",
-        "weight": 0,
-        "defaultStatus": "active",
-        "status": "active",
-        "createdAt": "2018-12-20T12:22:29.176Z"
-      },
       {
         "id": "duels-claim-chests",
         "name": "Claim Duels Chests",
