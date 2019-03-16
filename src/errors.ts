@@ -4,6 +4,7 @@ export enum GAMEBOT_ERROR_CODES {
     API_400_ERROR = 'API_400_ERROR',
     API_500_ERROR = 'API_500_ERROR',
     API_DATA_ERROR = 'API_DATA_ERROR',
+    JOB_CONFIG_ERROR = 'JOB_CONFIG_ERROR',
 }
 
 export type GamebotErrorDetails = {
@@ -48,5 +49,11 @@ export class GamebotApi500Error extends GamebotError {
 export class GamebotApiDataError extends GamebotError {
     constructor(message: string, details: GamebotErrorDetails, statusCode: number = 500) {
         super(GAMEBOT_ERROR_CODES.API_DATA_ERROR, message, details, statusCode);
+    }
+}
+
+export class GamebotJobConfigError extends GamebotError {
+    constructor(message: string, details: GamebotErrorDetails, statusCode: number = 500) {
+        super(GAMEBOT_ERROR_CODES.JOB_CONFIG_ERROR, message, details, statusCode);
     }
 }

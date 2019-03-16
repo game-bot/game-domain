@@ -8,16 +8,6 @@
     "createdAt": "2018-12-20T12:22:29.176Z",
     "jobs": [
       {
-        "id": "cards-random-fight",
-        "name": "Cards Random Fight",
-        "description": "Fight a random place",
-        "frequency": "30m",
-        "weight": 0,
-        "defaultStatus": "active",
-        "status": "active",
-        "createdAt": "2018-12-20T12:22:29.176Z"
-      },
-      {
         "id": "manage-duels",
         "name": "Manage Duels",
         "description": "Fight and open chests",
@@ -26,6 +16,17 @@
         "defaultStatus": "active",
         "status": "active",
         "createdAt": "2018-12-20T12:22:29.176Z"
+      },
+      {
+        "id": "campaing-fight-city",
+        "name": "Campaing Fight City",
+        "description": "Attacks an almost random place in the City (first campaign location)",
+        "details": "It executes only when you have more than 50 energy and attacks only places you have already won.",
+        "frequency": "30m",
+        "weight": 0,
+        "defaultStatus": "active",
+        "status": "active",
+        "createdAt": "2019-03-16T17:22:29.176Z"
       },
       {
         "id": "store-open-bronze-box",

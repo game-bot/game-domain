@@ -9,16 +9,20 @@ import { CardsFightApiData } from "../data/api/cards-fight-data";
 import { getRandomIntInclusive } from "@gamebot/domain";
 import { GameJobInfo } from "../../../entities/game-job-info";
 import { ApiEndpoints } from "../data/endpoints";
+import { GamebotJobConfigError } from "../../../errors";
 
-export default class CardsBattleFightJob extends SmutstoneJob {
+export class CampaignFightLocationJob extends SmutstoneJob {
     private task: CardsBattleFightTask
-    constructor(api: SmutstoneApi) {
-        super(__filename, api);
+    constructor(file: string, api: SmutstoneApi, private locationIndex: number) {
+        super(file, api);
+        if (locationIndex < 0) {
+            throw new Error(`Invalid location index: ${locationIndex}`);
+        }
         this.task = new CardsBattleFightTask(this.info, api);
     }
 
     protected async innerExecute(player: Player) {
-        const userData = (await this.api.userData(player));
+        const userData = await this.api.userData(player);
 
         if (userData.resources.energy < 50) {
             return this.createJobResult({
@@ -27,10 +31,32 @@ export default class CardsBattleFightJob extends SmutstoneJob {
             })
         }
 
-        const locationIndex = getRandomIntInclusive(0, userData.story.locations.length - 1);
+        const locationIndex = this.locationIndex;
+
         const location = userData.story.locations[locationIndex];
-        const missionIndex = getRandomIntInclusive(0, location.missions.filter(item => item.doneStars > 2).length);
-        const mission = location.missions[missionIndex];
+        if (!location) {
+            return this.createJobResult({
+                playerId: player.id,
+                status: 'error',
+                error: new GamebotJobConfigError(
+                    `You don't have access to location ${locationIndex + 1}`,
+                    { gameId: this.info.gameId, jobId: this.info.id }),
+            })
+        }
+
+        const validMissions = location.missions.filter(item => item.doneStars > 2);
+        if (validMissions.length === 0) {
+            return this.createJobResult({
+                playerId: player.id,
+                status: 'error',
+                error: new GamebotJobConfigError(
+                    `You don't have any 3 star mission on location ${this.locationIndex + 1}`,
+                    { gameId: this.info.gameId, jobId: this.info.id }),
+            })
+        }
+
+        const missionIndex = getRandomIntInclusive(0, validMissions.length);
+        const mission = validMissions[missionIndex];
         const args = { "location": location.id, "mission": mission.id, "deck": 1 };
 
         const fightResults = await this.task.execute(player, args);
