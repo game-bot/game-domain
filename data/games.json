@@ -18,6 +18,16 @@
         "createdAt": "2018-12-20T12:22:29.176Z"
       },
       {
+        "id": "duels-claim-chests",
+        "name": "Claim Duels Chests",
+        "description": "Claims duels chests, when they are ready.",
+        "frequency": "30m",
+        "weight": 0,
+        "defaultStatus": "active",
+        "status": "active",
+        "createdAt": "2018-12-20T22:15:29.176Z"
+      },
+      {
         "id": "duels-fights",
         "name": "Duel Fights",
         "description": "If there are empty slots, starts a few duels.",
