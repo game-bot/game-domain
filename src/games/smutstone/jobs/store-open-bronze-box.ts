@@ -9,7 +9,7 @@ import { LootboxOpenApiData } from "../data/api/toolbox-data";
 import { GameJobInfo } from "../../../entities/game-job-info";
 import { ApiEndpoints } from "../data/endpoints";
 
-export default class OpenBronzeBoxJob extends SmutstoneJob {
+export default class StoreOpenBronzeBoxJob extends SmutstoneJob {
     private task: OpenBronzeBoxTask
     constructor(api: SmutstoneApi) {
         super(__filename, api);

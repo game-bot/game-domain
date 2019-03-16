@@ -28,9 +28,9 @@
         "createdAt": "2018-12-20T12:22:29.176Z"
       },
       {
-        "id": "open-bronze-box",
+        "id": "store-open-bronze-box",
         "name": "Open Bronze Box",
-        "description": "Open free bronse box",
+        "description": "Opens the bronze box in the store when it's available.",
         "frequency": "8h",
         "weight": 0,
         "defaultStatus": "active",
