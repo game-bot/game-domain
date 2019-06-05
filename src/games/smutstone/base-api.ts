@@ -119,7 +119,7 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
         }
         const jsonString = execResult[1].replace(/\\"/g, '"');
         data = JSON.parse(jsonString);
-        const result = /"apiVersion":\s*\d+/.exec(response.data);
+        const result = /"apiVersion":\s*(\d+)/.exec(response.data);
         if (!result) {
           throw new Error(`Cannot find apiVersion`);
         }
