@@ -1,36 +1,36 @@
 import { IDictionary } from "@gamebot/domain";
 
-export type GameResourcesData = IDictionary<number>
+export type GameResourcesData = IDictionary<number>;
 
-export class GameResources<T extends string=string> {
-    constructor(private data: GameResourcesData = {}) { }
+export class GameResources<T extends string = string> {
+  constructor(private data: GameResourcesData = {}) {}
 
-    static create<T extends string>(data?: GameResourcesData) {
-        return new GameResources<T>(data);
+  static create<T extends string>(data?: GameResourcesData) {
+    return new GameResources<T>(data);
+  }
+
+  set(name: T, count: number) {
+    this.data[name as string] = count;
+  }
+
+  get(name: T) {
+    const count = this.data[name as string];
+    if (typeof count !== "number") {
+      return undefined;
     }
 
-    set(name: T, count: number) {
-        this.data[name as string] = count;
-    }
+    return count;
+  }
 
-    get(name: T) {
-        const count = this.data[name as string];
-        if (typeof count !== 'number') {
-            return undefined;
-        }
+  inc(name: T, count: number) {
+    this.data[name as string] = (this.get(name) || 0) + count;
+  }
 
-        return count;
-    }
+  remove(name: T) {
+    delete this.data[name as string];
+  }
 
-    inc(name: T, count: number) {
-        this.data[name as string] = (this.get(name) || 0) + count;
-    }
-
-    remove(name: T) {
-        delete this.data[name as string];
-    }
-
-    getData() {
-        return this.data;
-    }
+  getData() {
+    return this.data;
+  }
 }

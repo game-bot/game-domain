@@ -1,4 +1,4 @@
-const debug = require('debug')('gamebot');
+const debug = require("debug")("gamebot");
 
 import { Player } from "./entities/player";
 import { GameTaskResultStatus, GameTaskResult } from "./game-task";
@@ -8,114 +8,126 @@ import { dataGameJobByFile } from "./data";
 import { GameJobInfo } from "./entities/game-job-info";
 
 export type GameJobResult = {
-    gameId: string
-    playerId: string
-    jobId: string
-    status: GameTaskResultStatus
-    error?: GamebotError
-    resources?: GameResourcesData
-    tasks?: GameTaskResult[]
-    startAt?: string
-    endAt?: string
-}
+  gameId: string;
+  playerId: string;
+  jobId: string;
+  status: GameTaskResultStatus;
+  error?: GamebotError;
+  resources?: GameResourcesData;
+  tasks?: GameTaskResult[];
+  startAt?: string;
+  endAt?: string;
+};
 
 export interface IGameJob {
-    execute(player: Player): Promise<GameJobResult>
+  execute(player: Player): Promise<GameJobResult>;
 }
 
 export abstract class GameJob implements IGameJob {
-    protected info: GameJobInfo
-    constructor(jobFile: string) {
-        const info = dataGameJobByFile(jobFile);
-        if (!info) {
-            throw new Error(`Invalid job file path: ${jobFile}`);
-        }
-
-        this.info = info;
+  protected info: GameJobInfo;
+  constructor(jobFile: string) {
+    const info = dataGameJobByFile(jobFile);
+    if (!info) {
+      throw new Error(`Invalid job file path: ${jobFile}`);
     }
 
-    async execute(player: Player): Promise<GameJobResult> {
-        const jobName = this.constructor.name;
-        debug(`Start job: ${jobName}`);
-        const startAt = new Date().toISOString();
-        const result = await this.innerExecute(player);
-        const endAt = new Date().toISOString();
-        result.startAt = startAt;
-        result.endAt = endAt;
-        debug(`End job: ${jobName}`);
-        return result;
+    this.info = info;
+  }
+
+  async execute(player: Player): Promise<GameJobResult> {
+    const jobName = this.constructor.name;
+    debug(`Start job: ${jobName}`);
+    const startAt = new Date().toISOString();
+    const result = await this.innerExecute(player);
+    const endAt = new Date().toISOString();
+    result.startAt = startAt;
+    result.endAt = endAt;
+    debug(`End job: ${jobName}`);
+    return result;
+  }
+
+  protected async createJobResultFromTaskResults(
+    taskResults: GameTaskResult[]
+  ) {
+    if (taskResults.length === 0) {
+      throw new Error(`taskResults.length must be > 0`);
     }
 
-    protected async createJobResultFromTaskResults(taskResults: GameTaskResult[]) {
-        if (taskResults.length === 0) {
-            throw new Error(`taskResults.length must be > 0`);
-        }
+    const result = this.createJobResultFromTaskResult(
+      taskResults[taskResults.length - 1]
+    );
 
-        const result = this.createJobResultFromTaskResult(taskResults[taskResults.length - 1]);
-
-        if (taskResults.length > 0) {
-            const resourcesList = taskResults.map(item => item.resources).filter(item => !!item) as GameResourcesData[];
-            const resources = GameJob.mergeGameResources(resourcesList);
-            result.resources = resources.getData();
-        }
-
-        result.tasks = taskResults;
-
-        return result;
+    if (taskResults.length > 0) {
+      const resourcesList = taskResults
+        .map(item => item.resources)
+        .filter(item => !!item) as GameResourcesData[];
+      const resources = GameJob.mergeGameResources(resourcesList);
+      result.resources = resources.getData();
     }
 
-    static mergeGameResources<R extends string=string>(resources: GameResourcesData[]) {
-        const total = new GameResources<R>();
+    result.tasks = taskResults;
 
-        for (const item of resources) {
-            Object.keys(item).forEach(key => {
-                total.inc(key as R, ((<any>item)[key] || 0));
-            });
-        }
+    return result;
+  }
 
-        return total;
+  static mergeGameResources<R extends string = string>(
+    resources: GameResourcesData[]
+  ) {
+    const total = new GameResources<R>();
+
+    for (const item of resources) {
+      Object.keys(item).forEach(key => {
+        total.inc(key as R, (<any>item)[key] || 0);
+      });
     }
 
-    protected abstract innerExecute(player: Player): Promise<GameJobResult>
+    return total;
+  }
 
-    protected createJobResultFromTaskResult(taskResult: GameTaskResult) {
-        const result = this.createJobResult(taskResult);
-        result.tasks = [taskResult];
+  protected abstract innerExecute(player: Player): Promise<GameJobResult>;
 
-        return result;
-    }
+  protected createJobResultFromTaskResult(taskResult: GameTaskResult) {
+    const result = this.createJobResult(taskResult);
+    result.tasks = [taskResult];
 
-    protected createJobResult({ playerId, error, resources, status, tasks }:
-        {
-            playerId: string,
-            error?: GamebotError,
-            resources?: GameResourcesData,
-            status?: GameTaskResultStatus,
-            tasks?: GameTaskResult[]
-        }) {
+    return result;
+  }
 
-        status = status || (error ? 'error' : 'done');
+  protected createJobResult({
+    playerId,
+    error,
+    resources,
+    status,
+    tasks
+  }: {
+    playerId: string;
+    error?: GamebotError;
+    resources?: GameResourcesData;
+    status?: GameTaskResultStatus;
+    tasks?: GameTaskResult[];
+  }) {
+    status = status || (error ? "error" : "done");
 
-        const result: GameJobResult = {
-            jobId: this.info.id,
-            gameId: this.info.gameId,
-            status,
-            playerId,
-            error,
-            resources,
-            tasks,
-        }
+    const result: GameJobResult = {
+      jobId: this.info.id,
+      gameId: this.info.gameId,
+      status,
+      playerId,
+      error,
+      resources,
+      tasks
+    };
 
-        return result;
-    }
+    return result;
+  }
 
-    protected createErrorDetails(data?: any) {
-        const details: GamebotErrorDetails = {
-            gameId: this.info.gameId,
-            jobId: this.info.id,
-            data,
-        };
+  protected createErrorDetails(data?: any) {
+    const details: GamebotErrorDetails = {
+      gameId: this.info.gameId,
+      jobId: this.info.id,
+      data
+    };
 
-        return details;
-    }
+    return details;
+  }
 }
