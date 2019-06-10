@@ -34,6 +34,7 @@ export type UserData = {
   vars: {
     __LBOX_T: number;
   };
+  updatedAt: number;
 };
 
 export type UserDataStoryLocation = {

@@ -118,12 +118,14 @@ export class BaseSmutstoneApi extends ApiCient<ApiEndpoints> {
           throw new Error(`Not fount userData in html`);
         }
         const jsonString = execResult[1].replace(/\\"/g, '"');
-        data = JSON.parse(jsonString);
+        const userData = JSON.parse(jsonString) as UserData;
+        userData.updatedAt = Date.now();
         const result = /"apiVersion":\s*(\d+)/.exec(response.data);
         if (!result) {
           throw new Error(`Cannot find apiVersion`);
         }
         this.version = parseInt(result[1]);
+        data = userData;
       }
 
       return item.mapper.map(data) as DATA;
