@@ -60,7 +60,8 @@ const UserDataPickFields = [
   "items",
   "country",
   "hero.exp",
-  "vars.__LBOX_T"
+  "vars.__LBOX_T",
+  "updatedAt"
 ];
 
 export class UserDataMapper extends EntityMapper<UserData> {
@@ -71,6 +72,7 @@ export class UserDataMapper extends EntityMapper<UserData> {
 
 const userDataSchema = Joi.object()
   .keys({
+    updatedAt: Joi.number().integer().positive().required(),
     email: Joi.string().email(),
     resources: Joi.object()
       .keys({
